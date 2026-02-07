@@ -3,21 +3,21 @@
 @theme {
   --color-background: #F5F5F7;
   --color-foreground: #000000;
-  
+
   --color-card: #FFFFFF;
   --color-card-foreground: #000000;
-  
+
   --color-sidebar: #000000;
   --color-sidebar-foreground: #FFFFFF;
-  
+
   --color-muted: #F0F0F0;
   --color-muted-foreground: #8E8E93;
-  
+
   --color-accent: #000000;
   --color-accent-foreground: #FFFFFF;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  
+
   --radius-xl: 24px;
 }
 
@@ -30,6 +30,81 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+}
+
+/* Custom Scrollbar Styles */
+@layer base {
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 0.3s ease;
+  }
+
+  *:hover {
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  }
+
+  /* Webkit Browsers (Chrome, Safari, Edge) */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 10px;
+  }
+
+  /* Show scrollbar thumb on hover of the scrollable element */
+  *:hover::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3) !important;
+  }
+
+  /* Support for Dark Mode */
+  @media (prefers-color-scheme: dark) {
+    * {
+      scrollbar-color: transparent transparent;
+    }
+
+    *:hover {
+      scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    }
+
+    *:hover::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3) !important;
+    }
+  }
+
+  /* If the application uses a .dark class for theme switching */
+  .dark * {
+    scrollbar-color: transparent transparent;
+  }
+
+  .dark *:hover {
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  }
+
+  .dark *:hover::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3) !important;
+  }
 }
 
 /* Custom Utilities for the specific border radius mentioned */
