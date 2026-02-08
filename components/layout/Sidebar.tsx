@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+import { logout } from '@/app/(auth)/actions';
+
 export function Sidebar() {
     const pathname = usePathname();
     const isBrand = pathname?.includes('/brand');
@@ -31,6 +33,10 @@ export function Sidebar() {
     ];
 
     const links = isBrand ? brandLinks : influencerLinks;
+
+    const handleLogout = async () => {
+        await logout();
+    };
 
     return (
         <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-gray-100 bg-white dark:bg-black dark:border-gray-800 transition-transform">
@@ -69,7 +75,10 @@ export function Sidebar() {
                             </Link>
                         </li>
                         <li>
-                            <button className="flex w-full items-center rounded-lg p-2 text-gray-900 hover:bg-red-50 hover:text-red-600 dark:text-white dark:hover:bg-red-900/10 group transition-colors">
+                            <button
+                                onClick={handleLogout}
+                                className="flex w-full items-center rounded-lg p-2 text-gray-900 hover:bg-red-50 hover:text-red-600 dark:text-white dark:hover:bg-red-900/10 group transition-colors"
+                            >
                                 <LogOut className="h-5 w-5 text-gray-500 transition duration-75 group-hover:text-red-600 dark:text-gray-400" />
                                 <span className="ml-3">Logout</span>
                             </button>
@@ -80,3 +89,4 @@ export function Sidebar() {
         </aside>
     );
 }
+

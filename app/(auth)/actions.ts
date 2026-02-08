@@ -7,22 +7,40 @@ import { createClient } from '@/lib/supabase/server'
 export async function login(formData: FormData) {
     const supabase = await createClient()
 
-    // type-casting here for convenience
-    // in practice, you should use a library like zod to validate data
     const data = {
         email: formData.get('email') as string,
         password: formData.get('password') as string,
     }
 
-    const { error } = await supabase.auth.signInWithPassword(data)
+    const { data: authData, error } = await supabase.auth.signInWithPassword(data)
 
     if (error) {
         redirect('/login?error=' + encodeURIComponent(error.message))
     }
 
+    // 1. Try to get role from Metadata (Fastest, no DB query)
+    let role = authData.user.user_metadata?.role
+
+    // 2. Fallback: Try to get role from Profiles table
+    if (!role) {
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', authData.user.id)
+            .single()
+        role = profile?.role
+    }
+
     revalidatePath('/', 'layout')
-    redirect('/brand/dashboard') // Default redirect, actual logic might vary based on role
+
+    // Redirection based on role
+    if (role === 'influencer') {
+        redirect('/influencer/dashboard')
+    } else {
+        redirect('/brand/dashboard')
+    }
 }
+
 
 export async function signup(formData: FormData) {
     const supabase = await createClient()
