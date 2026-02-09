@@ -50,7 +50,7 @@ export async function signup(formData: FormData) {
     const role = formData.get('role') as string
     const fullName = formData.get('fullName') as string
 
-    const { data, error } = await supabase.auth.signUp({
+    const { data: authData, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -62,16 +62,28 @@ export async function signup(formData: FormData) {
     })
 
     if (error) {
-        redirect('/signup?error=' + encodeURIComponent(error.message))
+        return redirect('/signup?error=' + encodeURIComponent(error.message))
     }
 
-    // Note: Profile insertion is usually handled by a Supabase trigger 
-    // linked to auth.users, but for this demo, we can manually insert or rely on trigger.
-    // The schema.sql provided has a profiles table.
+    // MANUALLY INSERT PROFILE (In case trigger isn't set up yet)
+    if (authData.user) {
+        const { error: profileError } = await supabase
+            .from('profiles')
+            .upsert({
+                id: authData.user.id,
+                full_name: fullName,
+                role: role,
+            })
+
+        if (profileError) {
+            console.error('Manual profile creation failed:', profileError.message)
+        }
+    }
 
     revalidatePath('/', 'layout')
-    redirect('/signup/success') // Redirect to a success page or dashboard
+    redirect('/signup/success')
 }
+
 
 export async function logout() {
     const supabase = await createClient()
