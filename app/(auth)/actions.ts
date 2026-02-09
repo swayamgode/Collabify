@@ -67,6 +67,7 @@ export async function signup(formData: FormData) {
 
     // MANUALLY INSERT PROFILE (In case trigger isn't set up yet)
     if (authData.user) {
+        console.log('Attempting manual profile insertion for:', authData.user.id)
         const { error: profileError } = await supabase
             .from('profiles')
             .upsert({
@@ -77,12 +78,16 @@ export async function signup(formData: FormData) {
 
         if (profileError) {
             console.error('Manual profile creation failed:', profileError.message)
+            // Redirect with the DB error so it's visible on the screen
+            return redirect('/signup?error=' + encodeURIComponent('Profile Setup Failed: ' + profileError.message))
         }
+        console.log('Profile created successfully!')
     }
 
     revalidatePath('/', 'layout')
-    redirect('/signup/success')
+    return redirect('/signup/success')
 }
+
 
 
 export async function logout() {
