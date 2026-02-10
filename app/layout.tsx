@@ -13,6 +13,8 @@ export const metadata: Metadata = {
   description: "Platform for Influencers and Brand Managers",
 };
 
+import { ChatBot } from "@/components/ChatBot";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -22,6 +24,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} antialiased`} suppressHydrationWarning>
         {children}
+        <ChatBot />
       </body>
     </html>
   );
