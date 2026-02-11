@@ -1,11 +1,27 @@
-'use client';
-
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
-import { ChevronLeft, Calendar, DollarSign, Users, Clock } from 'lucide-react';
+import { ChevronLeft, Calendar, DollarSign, Users, Clock, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
+import { getCampaignWithApplications } from '@/lib/actions/applications';
+import { format } from 'date-fns';
+import CampaignApplicationManager from './CampaignApplicationManager';
 
-export default function CampaignDetailsPage({ params }: { params: { id: string } }) {
+export default async function CampaignDetailsPage({ params }: { params: { id: string } }) {
+    const campaign = await getCampaignWithApplications(params.id) as any;
+
+    if (!campaign) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px]">
+                <h2 className="text-2xl font-bold">Campaign not found</h2>
+                <Link href="/brand/campaigns" className="mt-4">
+                    <Button>Back to Campaigns</Button>
+                </Link>
+            </div>
+        );
+    }
+
+    const approvedCount = campaign.applications?.filter((a: any) => a.status === 'approved').length || 0;
+
     return (
         <div className="space-y-8">
             <div className="flex items-center gap-4">
@@ -17,15 +33,15 @@ export default function CampaignDetailsPage({ params }: { params: { id: string }
                 <h1 className="text-3xl font-bold tracking-tight">Campaign Detail</h1>
             </div>
 
-            <div className="grid grid-cols-3 gap-6">
-                <div className="col-span-2 space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-6">
                     <Card>
                         <CardHeader>
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <CardTitle className="text-2xl">Summer Collection 2024</CardTitle>
+                                    <CardTitle className="text-2xl">{campaign.title}</CardTitle>
                                     <CardDescription className="mt-2 text-base">
-                                        Join us in promoting our new sustainable summer collection. We're looking for lifestyle and fashion creators.
+                                        {campaign.description}
                                     </CardDescription>
                                 </div>
                                 <Button variant="outline">Edit Campaign</Button>
@@ -39,7 +55,9 @@ export default function CampaignDetailsPage({ params }: { params: { id: string }
                                     </div>
                                     <div>
                                         <p className="text-xs text-gray-500">Deadline</p>
-                                        <p className="text-sm font-semibold">July 15, 2024</p>
+                                        <p className="text-sm font-semibold">
+                                            {campaign.deadline ? format(new Date(campaign.deadline), 'MMM d, yyyy') : 'No deadline'}
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
@@ -48,7 +66,7 @@ export default function CampaignDetailsPage({ params }: { params: { id: string }
                                     </div>
                                     <div>
                                         <p className="text-xs text-gray-500">Budget</p>
-                                        <p className="text-sm font-semibold">$5,000.00</p>
+                                        <p className="text-sm font-semibold">${campaign.budget}</p>
                                     </div>
                                 </div>
                             </div>
@@ -56,27 +74,18 @@ export default function CampaignDetailsPage({ params }: { params: { id: string }
                             <div className="mt-6">
                                 <h4 className="font-semibold mb-3">Requirements</h4>
                                 <ul className="list-disc list-inside space-y-2 text-sm text-gray-600">
-                                    <li>At least 10k followers on Instagram</li>
+                                    <li>Platform: {campaign.platforms?.join(', ') || 'Any'}</li>
                                     <li>Focus on high-quality visual content</li>
-                                    <li>Past experience with fashion brands preferred</li>
-                                    <li>3-4 Story posts and 1 Reel</li>
+                                    <li>Past experience with similar brands preferred</li>
                                 </ul>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Applications (0)</CardTitle>
-                            <CardDescription>No applications received yet for this campaign.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="h-[200px] flex flex-col items-center justify-center border-t">
-                            <div className="p-4 rounded-full bg-gray-50 mb-4">
-                                <Users size={32} className="text-gray-300" />
-                            </div>
-                            <p className="text-gray-500 text-sm">Applications will appear here once influencers start applying.</p>
-                        </CardContent>
-                    </Card>
+                    <CampaignApplicationManager
+                        applications={campaign.applications || []}
+                        campaignId={campaign.id}
+                    />
                 </div>
 
                 <div className="space-y-6">
@@ -87,20 +96,20 @@ export default function CampaignDetailsPage({ params }: { params: { id: string }
                         <CardContent className="space-y-4">
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-gray-500">Applications</span>
-                                <span className="font-semibold">0</span>
+                                <span className="font-semibold">{campaign.applications?.length || 0}</span>
                             </div>
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-gray-500">Approved</span>
-                                <span className="font-semibold">0</span>
+                                <span className="font-semibold">{approvedCount}</span>
                             </div>
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-gray-500">Budget Spent</span>
-                                <span className="font-semibold">$0 / $5,000</span>
+                                <span className="font-semibold">$0 / ${campaign.budget}</span>
                             </div>
                             <div className="pt-4 mt-4 border-t">
                                 <div className="flex items-center gap-2 text-xs text-amber-600 font-medium">
                                     <Clock size={14} />
-                                    <span>32 days left to apply</span>
+                                    <span>Active Campaign</span>
                                 </div>
                             </div>
                         </CardContent>

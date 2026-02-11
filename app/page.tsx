@@ -6,7 +6,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       {/* Navigation */}
       <header className="py-6 px-4 sm:px-8 flex justify-between items-center max-w-7xl mx-auto w-full">
-        <div className="text-2xl font-bold tracking-tight">SocialConnector.</div>
+        <div className="text-2xl font-bold tracking-tight">Collabify.</div>
         <nav className="hidden md:flex gap-8">
           <Link href="#features" className="text-sm font-medium hover:text-gray-600 transition-colors">Features</Link>
           <Link href="#how-it-works" className="text-sm font-medium hover:text-gray-600 transition-colors">How it Works</Link>
@@ -64,7 +64,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="py-8 text-center text-sm text-gray-400 border-t border-gray-100">
-        <p>© 2024 SocialConnector. All rights reserved.</p>
+        <p>© 2024 Collabify. All rights reserved.</p>
       </footer>
     </div>
   );

@@ -42,7 +42,7 @@ export function Sidebar() {
         <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-gray-100 bg-white dark:bg-black dark:border-gray-800 transition-transform">
             <div className="flex h-full flex-col px-3 py-4">
                 <Link href="/" className="mb-10 flex items-center pl-2.5">
-                    <span className="self-center whitespace-nowrap text-xl font-bold dark:text-white">SocialConnector.</span>
+                    <span className="self-center whitespace-nowrap text-xl font-bold dark:text-white">Collabify.</span>
                 </Link>
                 <ul className="space-y-2 font-medium flex-1">
                     {links.map((link) => {
