@@ -1,10 +1,11 @@
-'use client';
-
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { DollarSign, TrendingUp, Calendar, CreditCard, ArrowUpRight } from 'lucide-react';
+import { TrendingUp, CreditCard, ArrowUpRight } from 'lucide-react';
+import { getEarnings } from '@/lib/actions/payments';
 
-export default function EarningsPage() {
+export default async function EarningsPage() {
+    const { total, available, pending, transactions } = await getEarnings();
+
     return (
         <div className="space-y-8">
             <div className="flex items-center justify-between">
@@ -24,10 +25,10 @@ export default function EarningsPage() {
                         <CardTitle className="text-sm font-medium text-gray-400">Total Revenue</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold">$12,450.00</div>
+                        <div className="text-3xl font-bold">${total.toFixed(2)}</div>
                         <p className="text-xs text-green-400 flex items-center gap-1 mt-1">
                             <TrendingUp size={12} />
-                            +12% from last month
+                            +0% from last month
                         </p>
                     </CardContent>
                 </Card>
@@ -36,8 +37,8 @@ export default function EarningsPage() {
                         <CardTitle className="text-sm font-medium text-gray-400">Available to Withdraw</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-black">$3,200.00</div>
-                        <p className="text-xs text-gray-500 mt-1">Next payout in 3 days</p>
+                        <div className="text-3xl font-bold text-black">${available.toFixed(2)}</div>
+                        <p className="text-xs text-gray-500 mt-1">Earnings ready for payout</p>
                     </CardContent>
                 </Card>
                 <Card>
@@ -45,8 +46,8 @@ export default function EarningsPage() {
                         <CardTitle className="text-sm font-medium text-gray-400">Pending Clearings</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-black">$850.00</div>
-                        <p className="text-xs text-gray-500 mt-1">From 2 active campaigns</p>
+                        <div className="text-3xl font-bold text-black">${pending.toFixed(2)}</div>
+                        <p className="text-xs text-gray-500 mt-1">Ongoing or unprocessed payments</p>
                     </CardContent>
                 </Card>
             </div>
@@ -57,36 +58,41 @@ export default function EarningsPage() {
                     <CardDescription>Your latest payouts and campaign earnings.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="space-y-6">
-                        {[
-                            { label: 'Payment from LuxFit Wear', date: 'Dec 20, 2023', amount: '+$800.00', status: 'Completed' },
-                            { label: 'Payment from FreshBites', date: 'Dec 18, 2023', amount: '+$350.00', status: 'Completed' },
-                            { label: 'Platform Fee', date: 'Dec 18, 2023', amount: '-$35.00', status: 'Completed' },
-                            { label: 'Payment from GlowSkin', date: 'Dec 05, 2023', amount: '+$1,200.00', status: 'Completed' },
-                        ].map((tx, i) => (
-                            <div key={i} className="flex items-center justify-between py-2 mb-2 last:mb-0">
-                                <div className="flex items-center gap-4">
-                                    <div className={`p-2 rounded-full ${tx.amount.startsWith('+') ? 'bg-green-50 text-green-600' : 'bg-gray-50 text-gray-600'}`}>
-                                        <ArrowUpRight size={16} />
+                    {transactions.length === 0 ? (
+                        <div className="p-8 text-center text-gray-500">
+                            No transactions found.
+                        </div>
+                    ) : (
+                        <div className="space-y-6">
+                            {transactions.map((tx: any, i: number) => (
+                                <div key={i} className="flex items-center justify-between py-2 mb-2 last:mb-0">
+                                    <div className="flex items-center gap-4">
+                                        <div className={`p-2 rounded-full ${tx.amount.startsWith('+') ? 'bg-green-50 text-green-600' : 'bg-gray-50 text-gray-600'}`}>
+                                            <ArrowUpRight size={16} />
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold text-sm">{tx.label}</p>
+                                            <p className="text-xs text-gray-500">{tx.date}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="font-semibold text-sm">{tx.label}</p>
-                                        <p className="text-xs text-gray-500">{tx.date}</p>
+                                    <div className="text-right">
+                                        <p className={`font-bold text-sm ${tx.amount.startsWith('+') ? 'text-black' : 'text-red-500'}`}>
+                                            {tx.amount}
+                                        </p>
+                                        <p className={`text-xs uppercase font-medium ${tx.status === 'Completed' ? 'text-green-600' : 'text-amber-600'}`}>
+                                            {tx.status}
+                                        </p>
                                     </div>
                                 </div>
-                                <div className="text-right">
-                                    <p className={`font-bold text-sm ${tx.amount.startsWith('+') ? 'text-black' : 'text-red-500'}`}>
-                                        {tx.amount}
-                                    </p>
-                                    <p className="text-xs text-green-600 uppercase font-medium">{tx.status}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </CardContent>
-                <div className="p-4 border-t text-center">
-                    <Button variant="ghost" size="sm" className="text-gray-500">View All Transactions</Button>
-                </div>
+                {transactions.length > 0 && (
+                    <div className="p-4 border-t text-center">
+                        <Button variant="ghost" size="sm" className="text-gray-500">View All Transactions</Button>
+                    </div>
+                )}
             </Card>
         </div>
     );

@@ -21,12 +21,14 @@ export function Sidebar() {
     const isBrand = pathname?.includes('/brand');
 
     const brandLinks = [
+        { href: '/brand', label: 'Dashboard', icon: LayoutDashboard },
         { href: '/brand/campaigns', label: 'Campaigns', icon: Briefcase },
         { href: '/brand/create-campaign', label: 'Create Campaign', icon: PlusCircle },
         { href: '/brand/influencers', label: 'Find Influencers', icon: Users },
     ];
 
     const influencerLinks = [
+        { href: '/influencer', label: 'Dashboard', icon: LayoutDashboard },
         { href: '/influencer/browse', label: 'Browse Campaigns', icon: Search },
         { href: '/influencer/applied', label: 'My Applications', icon: Briefcase },
         { href: '/influencer/earnings', label: 'Earnings', icon: DollarSign },
