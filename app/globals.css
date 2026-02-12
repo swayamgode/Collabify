@@ -1,34 +1,36 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #050505;
-  --color-foreground: #ffffff;
+  --color-background: #F5F5F7;
+  --color-foreground: #000000;
 
-  --color-card: #0f0f10;
-  --color-card-foreground: #ffffff;
+  --color-card: #ffffff;
+  --color-card-foreground: #000000;
 
-  --color-sidebar: #0a0a0b;
+  --color-sidebar: #050505;
   --color-sidebar-foreground: #ffffff;
 
-  --color-muted: #1c1c1f;
-  --color-muted-foreground: #a1a1aa;
+  --color-muted: #f0f0f2;
+  --color-muted-foreground: #6b7280;
 
-  --color-accent: #6366f1;
+  --color-accent: #000000;
   --color-accent-foreground: #ffffff;
 
-  --color-primary: #818cf8;
-  --color-secondary: #c084fc;
+  --color-primary: #000000;
+  --color-secondary: #8E8E93;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
   --radius-xl: 24px;
+  --shadow-premium: 0 8px 30px rgba(0, 0, 0, 0.04);
+  --shadow-premium-hover: 0 8px 30px rgba(0, 0, 0, 0.08);
 }
 
 :root {
-  --background: #050505;
-  --foreground: #ffffff;
-  --primary: #818cf8;
-  --secondary: #c084fc;
+  --background: #F5F5F7;
+  --foreground: #000000;
+  --primary: #000000;
+  --secondary: #8E8e93;
 }
 
 body {
@@ -44,7 +46,7 @@ body {
   /* Firefox Scrollbar */
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+    scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
   }
 
   /* Webkit Scrollbar */
@@ -58,13 +60,13 @@ body {
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     transition: background 0.3s ease;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.2);
   }
 
   h1,
@@ -79,35 +81,39 @@ body {
 
 @layer utilities {
   .glass {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-sm;
   }
 
   .glass-dark {
-    @apply bg-black/40 backdrop-blur-xl border border-white/5;
+    @apply bg-black/90 backdrop-blur-xl border border-white/10 shadow-xl;
   }
 
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-br from-white via-white to-white/50;
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-black via-black/80 to-black/60;
   }
 
   .text-gradient-primary {
-    @apply bg-clip-text text-transparent bg-gradient-to-br from-primary to-secondary;
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-black to-gray-600;
   }
 
   .bg-gradient-mesh {
     background-image:
-      radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(192, 132, 252, 0.15) 0, transparent 50%);
+      radial-gradient(at 0% 0%, rgba(0, 0, 0, 0.03) 0, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(142, 142, 147, 0.05) 0, transparent 50%);
   }
 
   .border-gradient {
     border: 1px solid transparent;
-    background: linear-gradient(var(--background), var(--background)) padding-box,
-      linear-gradient(to right, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)) border-box;
+    background: linear-gradient(var(--card), var(--card)) padding-box,
+      linear-gradient(to right, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02)) border-box;
   }
 
   .rounded-design {
     border-radius: 24px;
+  }
+
+  .card-premium {
+    @apply bg-white border border-gray-100 shadow-premium hover:shadow-premium-hover transition-all duration-300;
   }
 
   .scrollbar-hide::-webkit-scrollbar {

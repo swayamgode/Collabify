@@ -36,17 +36,14 @@ export function Sidebar() {
 
     const links = isBrand ? brandLinks : influencerLinks;
 
-    const handleLogout = async () => {
-        await logout();
-    };
-
     return (
-        <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-white/5 bg-sidebar transition-transform hidden md:block">
-            <div className="flex h-full flex-col px-4 py-6">
-                <Link href="/" className="mb-10 flex items-center px-2">
-                    <span className="self-center whitespace-nowrap text-2xl font-bold text-gradient-primary tracking-tight">Collabify.</span>
+        <aside className="fixed left-4 top-4 bottom-4 z-40 w-24 bg-sidebar border border-white/10 rounded-[32px] transition-transform hidden md:block overflow-hidden shadow-2xl">
+            <div className="flex h-full flex-col items-center py-10">
+                <Link href="/" className="mb-12 flex items-center justify-center">
+                    <span className="text-3xl font-extrabold text-white tracking-widest">F.</span>
                 </Link>
-                <ul className="space-y-1.5 font-medium flex-1">
+
+                <ul className="space-y-10 flex-1 flex flex-col items-center">
                     {links.map((link) => {
                         const Icon = link.icon;
                         const isActive = pathname === link.href;
@@ -55,43 +52,34 @@ export function Sidebar() {
                                 <Link
                                     href={link.href}
                                     className={cn(
-                                        "flex items-center rounded-xl p-3 group transition-all duration-200",
+                                        "flex items-center justify-center p-3 rounded-2xl transition-all duration-300 group relative",
                                         isActive
-                                            ? "bg-primary text-white shadow-lg shadow-primary/20"
-                                            : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                                            ? "bg-white text-black shadow-lg scale-110"
+                                            : "text-secondary hover:text-white"
                                     )}
                                 >
-                                    <Icon className={cn("h-5 w-5 transition-colors", isActive ? "text-white" : "text-muted-foreground group-hover:text-foreground")} />
-                                    <span className="ml-3 text-sm">{link.label}</span>
+                                    <Icon className={cn("h-6 w-6 transition-all", isActive ? "stroke-[2.5px]" : "stroke-[1.5px]")} />
+                                    {isActive && (
+                                        <div className="absolute -right-2 w-1.5 h-1.5 bg-white rounded-full shadow-glow"></div>
+                                    )}
                                 </Link>
                             </li>
                         );
                     })}
                 </ul>
-                <div className="mt-auto border-t border-white/5 pt-6">
-                    <ul className="space-y-1.5 font-medium">
-                        <li>
-                            <Link href="/settings" className={cn(
-                                "flex items-center rounded-xl p-3 text-muted-foreground hover:bg-white/5 hover:text-foreground transition-all duration-200",
-                                pathname === '/settings' && "bg-white/5 text-foreground"
-                            )}>
-                                <Settings className="h-5 w-5" />
-                                <span className="ml-3 text-sm">Settings</span>
-                            </Link>
-                        </li>
-                        <li>
-                            <button
-                                onClick={handleLogout}
-                                className="flex w-full items-center rounded-xl p-3 text-muted-foreground hover:bg-red-500/10 hover:text-red-400 transition-all duration-200 group"
-                            >
-                                <LogOut className="h-5 w-5 transition-colors" />
-                                <span className="ml-3 text-sm">Logout</span>
-                            </button>
-                        </li>
-                    </ul>
+
+                <div className="mt-auto space-y-8 flex flex-col items-center">
+                    <Link href="/settings" className={cn(
+                        "p-3 rounded-2xl transition-all hover:bg-white/5 group",
+                        pathname === '/settings' ? "bg-white text-black" : "text-secondary"
+                    )}>
+                        <Settings className="h-6 w-6" />
+                    </Link>
+                    <button className="p-3 rounded-2xl text-secondary hover:text-red-400 transition-all">
+                        <LogOut className="h-6 w-6" />
+                    </button>
                 </div>
             </div>
         </aside>
     );
-}
-
+};

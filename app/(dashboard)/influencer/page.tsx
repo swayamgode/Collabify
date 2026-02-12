@@ -8,54 +8,58 @@ export default async function InfluencerDashboardPage() {
     const stats = await getInfluencerStats();
 
     return (
-        <div className="space-y-8">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Influencer Dashboard</h1>
-                    <p className="text-muted-foreground">Welcome back! Manage your collaborations and earnings.</p>
-                </div>
+        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="flex items-center justify-end">
                 <Link href="/influencer/browse">
-                    <Button className="gap-2">
+                    <Button className="gap-2 px-8">
                         <Search size={18} />
                         Find Campaigns
                     </Button>
                 </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <Card className="hover:scale-[1.02] transition-transform">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Pending Apps</CardTitle>
-                        <Briefcase size={16} className="text-muted-foreground" />
+                        <CardTitle className="text-sm font-medium text-secondary uppercase tracking-widest">Active Apps</CardTitle>
+                        <div className="p-2 bg-black/5 rounded-xl">
+                            <Briefcase size={16} className="text-black" />
+                        </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{stats?.activeApps || 0}</div>
-                        <p className="text-xs text-muted-foreground mt-1">Waiting for brand review</p>
+                        <div className="text-4xl font-bold tracking-tight">{stats?.activeApps || 0}</div>
+                        <p className="text-xs text-secondary mt-2">Waiting for brand review</p>
                     </CardContent>
                 </Card>
-                <Card>
+
+                <Card className="hover:scale-[1.02] transition-transform">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
-                        <DollarSign size={16} className="text-muted-foreground" />
+                        <CardTitle className="text-sm font-medium text-secondary uppercase tracking-widest">Earnings</CardTitle>
+                        <div className="p-2 bg-black/5 rounded-xl">
+                            <DollarSign size={16} className="text-black" />
+                        </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">${stats?.earnings || 0}</div>
-                        <p className="text-xs text-muted-foreground mt-1">Cleared and available</p>
+                        <div className="text-4xl font-bold tracking-tight">${stats?.earnings || 0}</div>
+                        <p className="text-xs text-secondary mt-2">Cleared and available</p>
                     </CardContent>
                 </Card>
-                <Card>
+
+                <Card className="hover:scale-[1.02] transition-transform">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">New Campaigns</CardTitle>
-                        <Star size={16} className="text-muted-foreground" />
+                        <CardTitle className="text-sm font-medium text-secondary uppercase tracking-widest">New Deals</CardTitle>
+                        <div className="p-2 bg-black/5 rounded-xl">
+                            <Star size={16} className="text-black" />
+                        </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{stats?.newCampaigns || 0}</div>
-                        <p className="text-xs text-muted-foreground mt-1">Live deals to explore</p>
+                        <div className="text-4xl font-bold tracking-tight">{stats?.newCampaigns || 0}</div>
+                        <p className="text-xs text-secondary mt-2">Live deals to explore</p>
                     </CardContent>
                 </Card>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <Card>
                     <CardHeader>
                         <CardTitle>Next Steps</CardTitle>
@@ -63,15 +67,15 @@ export default async function InfluencerDashboardPage() {
                     </CardHeader>
                     <CardContent className="grid gap-4">
                         <Link href="/settings">
-                            <Button variant="outline" className="w-full justify-between group rounded-2xl">
+                            <Button variant="outline" className="w-full justify-between group rounded-2xl h-14 px-6 border-gray-100 hover:border-black/10 transition-all">
                                 Complete Your Profile
-                                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                             </Button>
                         </Link>
                         <Link href="/influencer/browse">
-                            <Button variant="outline" className="w-full justify-between group rounded-2xl">
+                            <Button variant="outline" className="w-full justify-between group rounded-2xl h-14 px-6 border-gray-100 hover:border-black/10 transition-all">
                                 Apply for More Deals
-                                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                             </Button>
                         </Link>
                     </CardContent>
@@ -83,9 +87,10 @@ export default async function InfluencerDashboardPage() {
                         <CardDescription>Maximize your collaboration success.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="p-5 bg-white/5 border border-white/5 rounded-2xl space-y-2">
-                            <p className="text-sm font-medium">Tip: High Engagement Matters</p>
-                            <p className="text-xs text-muted-foreground">Brands prioritize creators with consistent engagement over raw follower counts.</p>
+                        <div className="p-6 bg-background rounded-[24px] border border-gray-100 space-y-3 relative overflow-hidden group">
+                            <div className="absolute right-0 top-0 w-24 h-24 bg-black/[0.02] rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+                            <p className="text-base font-bold text-foreground">High Engagement Matters</p>
+                            <p className="text-sm text-secondary leading-relaxed">Brands prioritize creators with consistent engagement over raw follower counts. Focus on your community!</p>
                         </div>
                     </CardContent>
                 </Card>
