@@ -43,9 +43,9 @@ export default function CreateCampaignPage() {
     if (success) {
         return (
             <div className="max-w-3xl mx-auto flex flex-col items-center justify-center min-h-[400px] space-y-4">
-                <CheckCircle2 className="h-16 w-16 text-green-500" />
+                <CheckCircle2 className="h-16 w-16 text-primary" />
                 <h2 className="text-2xl font-bold">Campaign Created!</h2>
-                <p className="text-gray-500 text-center">Your campaign has been successfully created and is now active. Redirecting you to your campaigns...</p>
+                <p className="text-muted-foreground text-center">Your campaign has been successfully created and is now active. Redirecting you to your campaigns...</p>
             </div>
         );
     }
@@ -54,7 +54,7 @@ export default function CreateCampaignPage() {
         <div className="max-w-3xl mx-auto space-y-8">
             <div className="flex items-center gap-4">
                 <Link href="/brand/campaigns">
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <Button variant="outline" size="sm" className="h-10 w-10 p-0 rounded-xl">
                         <ChevronLeft size={20} />
                     </Button>
                 </Link>
@@ -69,7 +69,7 @@ export default function CreateCampaignPage() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                         {error && (
-                            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl flex items-center gap-3 text-sm">
+                            <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl flex items-center gap-3 text-sm">
                                 <AlertCircle size={18} />
                                 {error}
                             </div>
@@ -86,7 +86,7 @@ export default function CreateCampaignPage() {
                                 id="description"
                                 name="description"
                                 required
-                                className="flex min-h-[120px] w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="flex min-h-[120px] w-full rounded-xl border border-white/5 bg-white/5 px-4 py-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:cursor-not-allowed disabled:opacity-50 transition-all"
                                 placeholder="Describe what you want influencers to do..."
                             />
                         </div>
@@ -104,17 +104,17 @@ export default function CreateCampaignPage() {
 
                         <div className="grid gap-2">
                             <label className="text-sm font-medium" htmlFor="platforms">Required Platforms</label>
-                            <div className="flex gap-4">
+                            <div className="flex flex-wrap gap-4">
                                 {['Instagram', 'TikTok', 'YouTube', 'Twitter'].map(platform => (
-                                    <label key={platform} className="flex items-center gap-2 cursor-pointer">
-                                        <input type="checkbox" name="platforms" value={platform} className="rounded border-gray-300" />
-                                        <span className="text-sm">{platform}</span>
+                                    <label key={platform} className="flex items-center gap-2 cursor-pointer text-sm">
+                                        <input type="checkbox" name="platforms" value={platform} className="rounded border-white/10 bg-white/5" />
+                                        <span>{platform}</span>
                                     </label>
                                 ))}
                             </div>
                         </div>
                     </CardContent>
-                    <CardFooter className="flex justify-end gap-4 border-t px-6 py-4">
+                    <CardFooter className="flex justify-end gap-3 border-t border-white/5 bg-white/[0.02] px-6 py-4">
                         <Link href="/brand/campaigns">
                             <Button variant="outline" type="button" disabled={isLoading}>Cancel</Button>
                         </Link>

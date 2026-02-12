@@ -12,7 +12,7 @@ export default async function BrandDashboardPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Dashboard Overview</h1>
-                    <p className="text-gray-500">Welcome back! Here's what's happening with your campaigns.</p>
+                    <p className="text-muted-foreground">Welcome back! Here's what's happening with your campaigns.</p>
                 </div>
                 <Link href="/brand/create-campaign">
                     <Button className="gap-2">
@@ -26,31 +26,31 @@ export default async function BrandDashboardPage() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Active Campaigns</CardTitle>
-                        <Briefcase size={16} className="text-gray-400" />
+                        <Briefcase size={16} className="text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{stats?.activeCampaigns || 0}</div>
-                        <p className="text-xs text-gray-500 mt-1">Ready for influencers</p>
+                        <p className="text-xs text-muted-foreground mt-1">Ready for influencers</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Applications</CardTitle>
-                        <Users size={16} className="text-gray-400" />
+                        <Users size={16} className="text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{stats?.totalApps || 0}</div>
-                        <p className="text-xs text-gray-500 mt-1">Creators wanting to collab</p>
+                        <p className="text-xs text-muted-foreground mt-1">Creators wanting to collab</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
-                        <DollarSign size={16} className="text-gray-400" />
+                        <DollarSign size={16} className="text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">${stats?.spent || 0}</div>
-                        <p className="text-xs text-gray-500 mt-1">Across all collaborations</p>
+                        <p className="text-xs text-muted-foreground mt-1">Across all collaborations</p>
                     </CardContent>
                 </Card>
             </div>
@@ -63,13 +63,13 @@ export default async function BrandDashboardPage() {
                     </CardHeader>
                     <CardContent className="grid gap-4">
                         <Link href="/brand/influencers">
-                            <Button variant="outline" className="w-full justify-between group">
+                            <Button variant="outline" className="w-full justify-between group rounded-2xl">
                                 Find New Influencers
                                 <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                             </Button>
                         </Link>
                         <Link href="/brand/campaigns">
-                            <Button variant="outline" className="w-full justify-between group">
+                            <Button variant="outline" className="w-full justify-between group rounded-2xl">
                                 Manage Existing Campaigns
                                 <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                             </Button>
@@ -83,9 +83,9 @@ export default async function BrandDashboardPage() {
                         <CardDescription>AI-powered suggestions for your brand.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="p-4 bg-gray-50 rounded-xl space-y-2">
-                            <p className="text-sm font-medium">Trending Platform: TikTok</p>
-                            <p className="text-xs text-gray-500">Campaigns in the "Tech" niche are seeing 25% more engagement this week.</p>
+                        <div className="p-5 bg-white/5 border border-white/5 rounded-2xl space-y-2">
+                            <p className="text-sm font-medium text-primary">Trending Platform: TikTok</p>
+                            <p className="text-xs text-muted-foreground">Campaigns in the "Tech" niche are seeing 25% more engagement this week.</p>
                         </div>
                     </CardContent>
                 </Card>

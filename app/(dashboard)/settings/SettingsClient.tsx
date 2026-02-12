@@ -50,11 +50,11 @@ export default function SettingsClient({ data }: { data: any }) {
         <div className="max-w-4xl mx-auto space-y-8">
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-                <p className="text-gray-500">Manage your account and profile information.</p>
+                <p className="text-muted-foreground">Manage your account and profile information.</p>
             </div>
 
             {message && (
-                <div className={`px-4 py-3 rounded-xl flex items-center gap-3 text-sm ${message.type === 'success' ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'
+                <div className={`px-4 py-3 rounded-xl flex items-center gap-3 text-sm ${message.type === 'success' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
                     }`}>
                     {message.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
                     {message.text}
@@ -67,7 +67,7 @@ export default function SettingsClient({ data }: { data: any }) {
                     <Card>
                         <CardHeader>
                             <div className="flex items-center gap-2">
-                                <User className="text-gray-400" size={20} />
+                                <User className="text-primary" size={20} />
                                 <CardTitle>Personal Information</CardTitle>
                             </div>
                             <CardDescription>Update your basic contact and background details.</CardDescription>
@@ -83,18 +83,18 @@ export default function SettingsClient({ data }: { data: any }) {
                                     name="bio"
                                     defaultValue={profile.bio || ''}
                                     placeholder="Tell us about yourself..."
-                                    className="flex min-h-[100px] w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                                    className="flex min-h-[100px] w-full rounded-xl border border-white/5 bg-white/5 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-black transition-all"
                                 />
                             </div>
                             <div className="grid gap-2">
                                 <label className="text-sm font-medium">Website</label>
                                 <div className="relative">
-                                    <Globe className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                                    <Globe className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                                     <Input name="website" className="pl-10" defaultValue={profile.website || ''} placeholder="https://example.com" />
                                 </div>
                             </div>
                         </CardContent>
-                        <CardFooter className="border-t bg-gray-50/50 flex justify-end p-4">
+                        <CardFooter className="border-t border-white/5 bg-white/[0.02] flex justify-end p-4">
                             <Button type="submit" disabled={isLoading}>
                                 {isLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
                                 Save Profile
@@ -108,7 +108,7 @@ export default function SettingsClient({ data }: { data: any }) {
                     <Card>
                         <CardHeader>
                             <div className="flex items-center gap-2">
-                                <Briefcase className="text-gray-400" size={20} />
+                                <Briefcase className="text-primary" size={20} />
                                 <CardTitle>{profile.role === 'influencer' ? 'Influencer Details' : 'Brand Details'}</CardTitle>
                             </div>
                             <CardDescription>
@@ -123,7 +123,7 @@ export default function SettingsClient({ data }: { data: any }) {
                                     <div className="grid gap-2">
                                         <label className="text-sm font-medium">Social Handle</label>
                                         <div className="relative">
-                                            <Hash className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                                            <Hash className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                                             <Input name="socialHandle" className="pl-10" defaultValue={roleData?.social_handle || ''} placeholder="@username" />
                                         </div>
                                     </div>
@@ -141,7 +141,7 @@ export default function SettingsClient({ data }: { data: any }) {
                                                         name="platforms"
                                                         value={p}
                                                         defaultChecked={roleData?.platforms?.includes(p)}
-                                                        className="rounded border-gray-300"
+                                                        className="rounded border-white/10 bg-white/5"
                                                     />
                                                     {p}
                                                 </label>
@@ -152,7 +152,7 @@ export default function SettingsClient({ data }: { data: any }) {
                                         <label className="text-sm font-medium">Niches (Multiselect)</label>
                                         <div className="flex flex-wrap gap-2">
                                             {['Fashion', 'Tech', 'Fitness', 'Food', 'Travel', 'Lifestyle'].map(n => (
-                                                <label key={n} className="flex items-center gap-2 px-3 py-1 bg-gray-50 border rounded-full cursor-pointer hover:bg-gray-100 transition-colors">
+                                                <label key={n} className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/5 rounded-full cursor-pointer hover:bg-white/10 hover:border-white/10 transition-colors">
                                                     <input
                                                         type="checkbox"
                                                         name="niche"
@@ -186,7 +186,7 @@ export default function SettingsClient({ data }: { data: any }) {
                                                         name="platforms"
                                                         value={p}
                                                         defaultChecked={roleData?.preferred_platforms?.includes(p)}
-                                                        className="rounded border-gray-300"
+                                                        className="rounded border-white/10 bg-white/5"
                                                     />
                                                     {p}
                                                 </label>
@@ -196,7 +196,7 @@ export default function SettingsClient({ data }: { data: any }) {
                                 </>
                             )}
                         </CardContent>
-                        <CardFooter className="border-t bg-gray-50/50 flex justify-end p-4">
+                        <CardFooter className="border-t border-white/5 bg-white/[0.02] flex justify-end p-4">
                             <Button type="submit" disabled={isLoading}>
                                 {isLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
                                 Update {profile.role === 'influencer' ? 'Influencer' : 'Brand'} Info
