@@ -61,26 +61,89 @@ export default function Home() {
           <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-200/20 blur-[150px] rounded-full -z-10 animate-pulse"></div>
           <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-200/20 blur-[150px] rounded-full -z-10 animate-pulse duration-700"></div>
 
+          {/* Floating Characters - Hero Integration */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden sm:block hidden">
+            <motion.img
+              src={influencers[0]}
+              initial={{ x: -100, y: 100, opacity: 0, rotate: -12 }}
+              animate={{ x: 100, y: 150, opacity: 0.4, rotate: -5 }}
+              transition={{ duration: 20, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
+              className="absolute left-0 top-1/4 w-64 grayscale opacity-20"
+            />
+            <motion.img
+              src={influencers[4]}
+              initial={{ x: 100, y: -50, opacity: 0, rotate: 12 }}
+              animate={{ x: -50, y: 0, opacity: 0.4, rotate: 5 }}
+              transition={{ duration: 15, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
+              className="absolute right-0 top-1/3 w-72 grayscale opacity-20"
+            />
+            <motion.img
+              src={influencers[2]}
+              initial={{ y: 200, opacity: 0 }}
+              animate={{ y: 100, opacity: 0.3 }}
+              transition={{ duration: 25, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
+              className="absolute left-1/4 bottom-0 w-56 grayscale opacity-10"
+            />
+          </div>
+
           <div className="max-w-7xl mx-auto w-full flex flex-col items-center text-center relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-white border border-gray-200 shadow-sm text-xs font-black mb-12 tracking-widest uppercase"
+              className="inline-flex items-center gap-4 px-6 py-2 rounded-full bg-white border border-gray-200 shadow-sm text-xs font-black mb-12 tracking-widest uppercase"
             >
-              <Sparkles size={14} className="text-black" />
+              <div className="flex -space-x-2">
+                {influencers.slice(0, 3).map((img, i) => (
+                  <img key={i} src={img} className="w-6 h-6 rounded-full border-2 border-white bg-gray-100 object-contain grayscale" />
+                ))}
+              </div>
               <span className="text-gray-700">Next-Gen Influence Engine</span>
+              <Sparkles size={14} className="text-black" />
             </motion.div>
 
-            <motion.h1
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3, duration: 0.8 }}
-              className="text-6xl sm:text-[120px] font-black tracking-tighter leading-[0.85] text-black mb-12"
-            >
-              UNLEASH YOUR <br />
-              <span className="italic font-serif text-gray-400">DIGITAL REACH.</span>
-            </motion.h1>
+            <div className="relative inline-block">
+              <motion.h1
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+                className="text-6xl sm:text-[120px] font-black tracking-tighter leading-[0.85] text-black mb-12 relative z-10"
+              >
+                UNLEASH YOUR <br />
+                <span className="italic font-serif text-gray-400">DIGITAL REACH.</span>
+              </motion.h1>
+
+              {/* Supporting Characters next to Title with Labels */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5, x: -50 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                transition={{ delay: 0.8, duration: 1 }}
+                className="absolute -left-48 top-0 hidden lg:flex flex-col items-center gap-2 group/char"
+              >
+                <img
+                  src={influencers[1]}
+                  className="w-40 grayscale group-hover/char:grayscale-0 transition-all duration-500 hover:scale-110 cursor-pointer"
+                />
+                <div className="px-3 py-1 bg-black text-white text-[10px] font-black rounded-full opacity-0 group-hover/char:opacity-100 transition-opacity uppercase tracking-tighter">
+                  @vanguard_creator
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5, x: 50 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                transition={{ delay: 1, duration: 1 }}
+                className="absolute -right-48 bottom-0 hidden lg:flex flex-col items-center gap-2 group/char"
+              >
+                <div className="px-3 py-1 bg-black text-white text-[10px] font-black rounded-full opacity-0 group-hover/char:opacity-100 transition-opacity uppercase tracking-tighter">
+                  @digital_pioneer
+                </div>
+                <img
+                  src={influencers[3]}
+                  className="w-40 grayscale group-hover/char:grayscale-0 transition-all duration-500 hover:scale-110 cursor-pointer"
+                />
+              </motion.div>
+            </div>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -111,9 +174,19 @@ export default function Home() {
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 1 }}
-              className="w-full max-w-5xl relative"
+              className="w-full max-w-5xl relative group/video"
             >
               <div className="absolute -inset-4 bg-gradient-to-b from-gray-200 to-transparent blur-2xl opacity-50"></div>
+
+              {/* Overlapping Character for Depth */}
+              <motion.img
+                src={influencers[4]}
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 1.2, duration: 1 }}
+                className="absolute -right-20 -top-20 w-64 hidden xl:block z-20 grayscale brightness-110 drop-shadow-2xl hover:grayscale-0 transition-all cursor-alias"
+              />
+
               <div className="relative rounded-[48px] overflow-hidden border-[12px] border-white shadow-[0_50px_100px_-20px_rgba(0,0,0,0.15)] bg-black group cursor-pointer aspect-video sm:aspect-auto sm:h-[600px]">
                 <video
                   autoPlay
