@@ -75,7 +75,12 @@ export function Sidebar() {
                     )}>
                         <Settings className="h-6 w-6" />
                     </Link>
-                    <button className="p-3 rounded-2xl text-secondary hover:text-red-400 transition-all">
+                    <button
+                        onClick={async () => {
+                            await logout();
+                        }}
+                        className="p-3 rounded-2xl text-secondary hover:text-red-400 transition-all"
+                    >
                         <LogOut className="h-6 w-6" />
                     </button>
                 </div>

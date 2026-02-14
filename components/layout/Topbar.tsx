@@ -1,15 +1,31 @@
 'use client';
 
-import { Bell, Search } from 'lucide-react';
+import { Bell, Search, Building2, User } from 'lucide-react';
 import { Input } from '@/components/ui/Input';
+import { usePathname } from 'next/navigation';
 
 export function Topbar() {
+    const pathname = usePathname();
+    const isBrand = pathname?.includes('/brand');
+    const role = isBrand ? 'Brand' : 'Influencer';
+    const greeting = isBrand
+        ? 'Welcome back to your brand dashboard!'
+        : 'Ready to find your next collaboration?';
+
     return (
         <div className="fixed top-6 left-40 right-10 z-30 flex items-start justify-between gap-6 pointer-events-none">
             <div className="flex-1 h-24 bg-white rounded-design shadow-premium border border-gray-100 px-12 flex items-center justify-between overflow-hidden relative pointer-events-auto">
-                <div className="z-10">
-                    <h2 className="text-3xl font-bold tracking-tight text-foreground">Hello Josh!</h2>
-                    <p className="text-secondary text-sm font-medium">It's good to see you again.</p>
+                <div className="z-10 flex items-center gap-4">
+                    <div>
+                        <div className="flex items-center gap-3 mb-1">
+                            <h2 className="text-3xl font-bold tracking-tight text-foreground">Hello Josh!</h2>
+                            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-black text-white flex items-center gap-1.5">
+                                {isBrand ? <Building2 size={12} /> : <User size={12} />}
+                                {role}
+                            </span>
+                        </div>
+                        <p className="text-secondary text-sm font-medium">{greeting}</p>
+                    </div>
                 </div>
                 {/* Subtle illustration placeholder area */}
                 <div className="absolute right-10 bottom-0 top-0 flex items-center">
