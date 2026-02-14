@@ -1,13 +1,22 @@
 'use client';
 
 import { Bell, Search, Building2, User } from 'lucide-react';
-import { Input } from '@/components/ui/Input';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { Profile } from '@/lib/types/database';
 
-export function Topbar() {
+interface TopbarProps {
+    user?: Profile | null;
+}
+
+export function Topbar({ user }: TopbarProps) {
     const pathname = usePathname();
+    const router = useRouter();
     const isBrand = pathname?.includes('/brand');
     const role = isBrand ? 'Brand' : 'Influencer';
+
+    // Default greeting if user name is missing
+    const userName = user?.full_name?.split(' ')[0] || 'Josh';
+
     const greeting = isBrand
         ? 'Welcome back to your brand dashboard!'
         : 'Ready to find your next collaboration?';
@@ -18,7 +27,7 @@ export function Topbar() {
                 <div className="z-10 flex items-center gap-4">
                     <div>
                         <div className="flex items-center gap-3 mb-1">
-                            <h2 className="text-3xl font-bold tracking-tight text-foreground">Hello Josh!</h2>
+                            <h2 className="text-3xl font-bold tracking-tight text-foreground">Hello {userName}!</h2>
                             <span className="px-3 py-1 rounded-full text-xs font-semibold bg-black text-white flex items-center gap-1.5">
                                 {isBrand ? <Building2 size={12} /> : <User size={12} />}
                                 {role}
@@ -39,6 +48,14 @@ export function Topbar() {
                     <input
                         type="text"
                         placeholder="Search"
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                const query = e.currentTarget.value;
+                                if (!query) return;
+                                const target = isBrand ? '/brand/influencers' : '/influencer/browse';
+                                router.push(`${target}?q=${encodeURIComponent(query)}`);
+                            }
+                        }}
                         className="bg-transparent border-none pl-7 pr-4 py-1 text-sm font-medium focus:ring-0 w-32 focus:w-48 transition-all placeholder:text-secondary"
                     />
                 </div>
@@ -49,7 +66,15 @@ export function Topbar() {
                 </button>
 
                 <div className="h-11 w-11 rounded-full bg-black/5 border-2 border-white shadow-sm overflow-hidden cursor-pointer hover:border-black/10 transition-all">
-                    <img src="https://ui-avatars.com/api/?name=Admin&background=000&color=fff" alt="User" />
+                    {user?.avatar_url ? (
+                        <img src={user.avatar_url} alt={userName} className="w-full h-full object-cover" />
+                    ) : (
+                        <img
+                            src={`https://ui-avatars.com/api/?name=${userName}&background=000&color=fff`}
+                            alt={userName}
+                            className="w-full h-full object-cover"
+                        />
+                    )}
                 </div>
             </div>
         </div>

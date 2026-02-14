@@ -45,10 +45,10 @@ export async function createCampaign(formData: FormData) {
     return { success: true, data }
 }
 
-export async function getCampaigns() {
+export async function getCampaigns(filters?: { search?: string }) {
     const supabase = await createClient()
 
-    const { data, error } = await supabase
+    let query = supabase
         .from('campaigns')
         .select(`
       *,
@@ -58,9 +58,20 @@ export async function getCampaigns() {
     `)
         .order('created_at', { ascending: false })
 
+    const { data, error } = await query
+
     if (error) {
         console.error('Error fetching campaigns:', error)
         return []
+    }
+
+    if (filters?.search && data) {
+        const searchLower = filters.search.toLowerCase()
+        return data.filter((campaign: any) =>
+            campaign.title.toLowerCase().includes(searchLower) ||
+            campaign.description?.toLowerCase().includes(searchLower) ||
+            campaign.brands?.company_name?.toLowerCase().includes(searchLower)
+        )
     }
 
     return data
