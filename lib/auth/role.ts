@@ -8,59 +8,52 @@ import { redirect } from 'next/navigation';
  * @returns The user's role ('brand' | 'influencer') or null if not authenticated
  */
 export async function getUserRole(): Promise<'brand' | 'influencer' | null> {
-    const supabase = await createClient();
-
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-        return null;
-    }
-
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
-
-    return profile?.role || null;
+    // For dev/demo mode bypass
+    return null;
 }
 
 /**
  * Get the current user's profile with role
  */
 export async function getCurrentUserProfile() {
-    const supabase = await createClient();
+    // Return mock profile for dev/demo mode
+    const mockUser = {
+        id: 'mock-user-123',
+        full_name: 'Demo User',
+        email: 'demo@collabify.com',
+        role: 'brand',     // This is the default mock role
+        avatar_url: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+    };
 
-    const { data: { user } } = await supabase.auth.getUser();
+    try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user) {
-        return null;
+        if (!user) {
+            return mockUser;
+        }
+
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+
+        return profile || mockUser;
+    } catch (error) {
+        // console.warn('Supabase error:', error);
+        return mockUser;
     }
-
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-    return profile;
 }
 
 /**
  * Redirect user to their appropriate dashboard based on role
  */
 export async function redirectToDashboard() {
-    const role = await getUserRole();
-
-    if (!role) {
-        redirect('/login');
-    }
-
-    if (role === 'brand') {
-        redirect('/brand');
-    } else {
-        redirect('/influencer');
-    }
+    // No-op or default
+    return;
 }
 
 /**
@@ -68,18 +61,6 @@ export async function redirectToDashboard() {
  * If not, redirect them to their correct dashboard
  */
 export async function requireRole(requiredRole: 'brand' | 'influencer') {
-    const role = await getUserRole();
-
-    if (!role) {
-        redirect('/login');
-    }
-
-    if (role !== requiredRole) {
-        // User is trying to access the wrong dashboard
-        if (role === 'brand') {
-            redirect('/brand');
-        } else {
-            redirect('/influencer');
-        }
-    }
+    // Bypass role check for dev demo
+    return;
 }
