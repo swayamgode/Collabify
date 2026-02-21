@@ -75,6 +75,46 @@ export default async function InfluencerDashboardPage() {
                 </Card>
             </div>
 
+            {/* Analytics Banner */}
+            <Link href="/influencer/analytics" className="block group">
+                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 p-8 shadow-2xl shadow-indigo-200 hover:shadow-indigo-300/60 transition-all duration-500 hover:-translate-y-1 cursor-pointer">
+                    <div className="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full -translate-y-32 translate-x-24 group-hover:scale-110 transition-transform duration-700" />
+                    <div className="absolute bottom-0 left-1/3 w-48 h-48 bg-white/5 rounded-full translate-y-20 group-hover:scale-125 transition-transform duration-700" />
+                    <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                        <div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <div className="p-2 bg-white/20 rounded-xl backdrop-blur">
+                                    <TrendingUp size={20} className="text-white" />
+                                </div>
+                                <span className="text-xs font-bold text-indigo-200 uppercase tracking-widest">Creator Analytics</span>
+                            </div>
+                            <h3 className="text-2xl font-black text-white mb-2">View Your Full Analytics Report</h3>
+                            <p className="text-indigo-100/80 text-sm max-w-lg leading-relaxed">
+                                See your total views, subscribers, average retention, engagement rate, audience demographics,
+                                platform breakdown — everything brands need to decide to work with you.
+                            </p>
+                            <div className="flex flex-wrap gap-4 mt-5">
+                                {[
+                                    { label: 'Total Reach', val: '2.8M' },
+                                    { label: 'Avg Retention', val: '62%' },
+                                    { label: 'Engagement', val: '6.8%' },
+                                    { label: 'Lifetime Views', val: '185M' },
+                                ].map(s => (
+                                    <div key={s.label} className="bg-white/15 backdrop-blur rounded-xl px-4 py-2 border border-white/20">
+                                        <div className="text-white font-black text-lg">{s.val}</div>
+                                        <div className="text-indigo-200 text-xs">{s.label}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="flex-shrink-0 flex items-center gap-3 bg-white text-indigo-700 font-black px-6 py-3.5 rounded-2xl shadow-lg group-hover:shadow-xl group-hover:-translate-x-1 transition-all">
+                            View Analytics
+                            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                        </div>
+                    </div>
+                </div>
+            </Link>
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-8">
                     <ActivityFeed items={activity} role="influencer" />

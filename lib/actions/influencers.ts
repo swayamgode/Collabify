@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { findYouTubeChannelId, getYouTubeChannelStats } from '@/lib/youtube'
 
 export async function getInfluencers(filters?: { niche?: string, platform?: string, search?: string }) {
     const supabase = await createClient()
@@ -21,12 +22,6 @@ export async function getInfluencers(filters?: { niche?: string, platform?: stri
     }
 
     if (filters?.search) {
-        // Search by profile name or social handle
-        // Using `or` filter with related table (profiles.full_name) is tricky in Supabase JS client directly with `ilike`.
-        // We'll search on social_handle or fetch all and filter in memory if necessary, 
-        // but try to use `or` on the main table first.
-        // Assuming profiles is joined, we can filter on profiles.full_name via specific syntax or simpler backend search.
-        // For simplicity, let's search just social_handle first, or use text search if enabled.
         query = query.ilike('social_handle', `%${filters.search}%`);
     }
 
@@ -37,8 +32,6 @@ export async function getInfluencers(filters?: { niche?: string, platform?: stri
         return []
     }
 
-    // If searching by name that is only in profiles, we might need a separate query or filter in JS
-    // Since we select `profiles`, let's filter in memory if simple join filter fails or is complex
     if (filters?.search && data) {
         const searchLower = filters.search.toLowerCase();
         return data.filter((inf: any) =>
@@ -48,4 +41,34 @@ export async function getInfluencers(filters?: { niche?: string, platform?: stri
     }
 
     return data
+}
+
+export async function searchExternalInfluencers(query: string) {
+    if (!query || query.length < 3) return [];
+
+    try {
+        const channelId = await findYouTubeChannelId(query);
+        if (!channelId) return [];
+
+        const stats = await getYouTubeChannelStats(channelId);
+        if (!stats) return [];
+
+        return [{
+            id: `external-${channelId}`,
+            is_external: true,
+            platform: 'YouTube',
+            profiles: {
+                full_name: stats.channelName,
+                avatar_url: stats.thumbnails?.medium?.url || stats.thumbnails?.default?.url
+            },
+            social_handle: query.startsWith('@') ? query : `@${stats.channelName.replace(/\s+/g, '')}`,
+            follower_count: stats.subscriberCount,
+            platforms: ['YouTube'],
+            niche: ['General Content'], // YouTube search doesn't give niche easily
+            stats: stats
+        }];
+    } catch (error) {
+        console.error('Error in searchExternalInfluencers:', error);
+        return [];
+    }
 }

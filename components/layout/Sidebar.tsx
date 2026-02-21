@@ -10,7 +10,8 @@ import {
     DollarSign,
     Search,
     Settings,
-    LogOut
+    LogOut,
+    BarChart2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -29,6 +30,7 @@ export function Sidebar() {
 
     const influencerLinks = [
         { href: '/influencer', label: 'Dashboard', icon: LayoutDashboard },
+        { href: '/influencer/analytics', label: 'Analytics', icon: BarChart2 },
         { href: '/influencer/browse', label: 'Browse Campaigns', icon: Search },
         { href: '/influencer/applied', label: 'My Applications', icon: Briefcase },
         { href: '/influencer/earnings', label: 'Earnings', icon: DollarSign },

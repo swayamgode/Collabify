@@ -37,7 +37,20 @@ CREATE TABLE campaigns (
   budget DECIMAL(12,2),
   deadline TIMESTAMP WITH TIME ZONE,
   status TEXT DEFAULT 'draft' CHECK (status IN ('draft', 'active', 'completed', 'cancelled')),
+  min_followers INTEGER,
+  requirements TEXT[],
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Connection Requests table (For direct brand-influencer connections)
+CREATE TABLE connection_requests (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  brand_id UUID REFERENCES brands(id) ON DELETE CASCADE NOT NULL,
+  influencer_id UUID REFERENCES influencers(id) ON DELETE CASCADE NOT NULL,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'declined')),
+  message TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(brand_id, influencer_id)
 );
 
 -- Applications table

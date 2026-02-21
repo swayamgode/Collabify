@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 };
 
 import { ChatBot } from "@/components/ChatBot";
+import { Toaster } from "sonner";
 
 export default function RootLayout({
   children,
@@ -24,6 +25,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} antialiased`} suppressHydrationWarning>
         {children}
+        <Toaster position="top-center" richColors />
         <ChatBot />
       </body>
     </html>

@@ -22,6 +22,8 @@ export async function createCampaign(formData: FormData) {
     const budget = parseFloat(formData.get('budget') as string)
     const deadline = formData.get('deadline') as string
     const platforms = formData.getAll('platforms') as string[]
+    const minFollowers = parseInt(formData.get('minFollowers') as string) || 0;
+    const requirements = formData.get('requirements') ? (formData.get('requirements') as string).split('\n').filter(r => r.trim() !== '') : [];
 
     const { data, error } = await supabase
         .from('campaigns')
@@ -32,6 +34,8 @@ export async function createCampaign(formData: FormData) {
             budget,
             deadline: deadline ? new Date(deadline).toISOString() : null,
             status: 'active', // default to active for now
+            min_followers: minFollowers,
+            requirements: requirements,
         })
         .select()
         .single()

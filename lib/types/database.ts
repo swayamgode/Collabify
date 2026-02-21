@@ -32,6 +32,8 @@ export type Campaign = {
     deadline?: string;
     status: 'draft' | 'active' | 'completed' | 'cancelled';
     created_at: string;
+    min_followers?: number;
+    requirements?: string[];
 };
 
 export type Application = {
@@ -41,6 +43,15 @@ export type Application = {
     status: 'pending' | 'under_review' | 'approved' | 'rejected';
     message?: string;
     applied_at: string;
+};
+
+export type ConnectionRequest = {
+    id: string;
+    brand_id: string;
+    influencer_id: string;
+    status: 'pending' | 'accepted' | 'declined';
+    message?: string;
+    created_at: string;
 };
 
 export type Payment = {

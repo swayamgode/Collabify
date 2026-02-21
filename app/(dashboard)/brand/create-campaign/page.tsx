@@ -93,7 +93,7 @@ export default function CreateCampaignPage() {
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="grid gap-2">
-                                <label className="text-sm font-medium" htmlFor="budget">Total Budget</label>
+                                <label className="text-sm font-medium" htmlFor="budget">Total Budget ($)</label>
                                 <Input id="budget" name="budget" type="number" placeholder="0.00" required />
                             </div>
                             <div className="grid gap-2">
@@ -102,16 +102,32 @@ export default function CreateCampaignPage() {
                             </div>
                         </div>
 
-                        <div className="grid gap-2">
-                            <label className="text-sm font-medium" htmlFor="platforms">Required Platforms</label>
-                            <div className="flex flex-wrap gap-4">
-                                {['Instagram', 'TikTok', 'YouTube', 'Twitter'].map(platform => (
-                                    <label key={platform} className="flex items-center gap-2 cursor-pointer text-sm">
-                                        <input type="checkbox" name="platforms" value={platform} className="rounded border-white/10 bg-white/5" />
-                                        <span>{platform}</span>
-                                    </label>
-                                ))}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="grid gap-2">
+                                <label className="text-sm font-medium" htmlFor="minFollowers">Minimum Followers</label>
+                                <Input id="minFollowers" name="minFollowers" type="number" placeholder="e.g. 50000" />
                             </div>
+                            <div className="grid gap-2">
+                                <label className="text-sm font-medium" htmlFor="platforms">Required Platforms</label>
+                                <div className="flex flex-wrap gap-4 pt-2">
+                                    {['Instagram', 'TikTok', 'YouTube', 'Twitter'].map(platform => (
+                                        <label key={platform} className="flex items-center gap-2 cursor-pointer text-sm">
+                                            <input type="checkbox" name="platforms" value={platform} className="rounded border-white/10 bg-white/5" />
+                                            <span>{platform}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid gap-2">
+                            <label className="text-sm font-medium" htmlFor="requirements">Specific Requirements</label>
+                            <textarea
+                                id="requirements"
+                                name="requirements"
+                                className="flex min-h-[100px] w-full rounded-xl border border-white/5 bg-white/5 px-4 py-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:cursor-not-allowed disabled:opacity-50 transition-all"
+                                placeholder="Enter requirements (one per line) e.g.&#10;Must be based in US&#10;Previous tech review experience&#10;High engagement rate"
+                            />
                         </div>
                     </CardContent>
                     <CardFooter className="flex justify-end gap-3 border-t border-white/5 bg-white/[0.02] px-6 py-4">
