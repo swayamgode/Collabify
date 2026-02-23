@@ -14,7 +14,6 @@ import {
     BarChart2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
 import { logout } from '@/app/(auth)/actions';
 
 export function Sidebar() {
@@ -24,69 +23,79 @@ export function Sidebar() {
     const brandLinks = [
         { href: '/brand', label: 'Dashboard', icon: LayoutDashboard },
         { href: '/brand/campaigns', label: 'Campaigns', icon: Briefcase },
-        { href: '/brand/create-campaign', label: 'Create Campaign', icon: PlusCircle },
-        { href: '/brand/influencers', label: 'Find Influencers', icon: Users },
+        { href: '/brand/create-campaign', label: 'Create', icon: PlusCircle },
+        { href: '/brand/influencers', label: 'Search', icon: Users },
     ];
 
     const influencerLinks = [
-        { href: '/influencer', label: 'Dashboard', icon: LayoutDashboard },
-        { href: '/influencer/analytics', label: 'Analytics', icon: BarChart2 },
-        { href: '/influencer/browse', label: 'Browse Campaigns', icon: Search },
-        { href: '/influencer/applied', label: 'My Applications', icon: Briefcase },
-        { href: '/influencer/earnings', label: 'Earnings', icon: DollarSign },
+        { href: '/influencer', label: 'Home', icon: LayoutDashboard },
+        { href: '/influencer/analytics', label: 'Trends', icon: BarChart2 },
+        { href: '/influencer/browse', label: 'Feed', icon: Search },
+        { href: '/influencer/applied', label: 'Work', icon: Briefcase },
+        { href: '/influencer/earnings', label: 'Payouts', icon: DollarSign },
     ];
 
     const links = isBrand ? brandLinks : influencerLinks;
 
     return (
-        <aside className="fixed left-4 top-4 bottom-4 z-40 w-24 bg-sidebar border border-white/10 rounded-[32px] transition-transform hidden md:block overflow-hidden shadow-2xl">
-            <div className="flex h-full flex-col items-center py-10">
-                <Link href="/" className="mb-12 flex items-center justify-center">
-                    <span className="text-3xl font-extrabold text-white tracking-widest">F.</span>
+        <aside className="fixed left-6 top-6 bottom-6 z-40 w-24 bg-black rounded-[40px] transition-all hidden md:block overflow-hidden shadow-2xl">
+            <div className="flex h-full flex-col items-center py-12">
+                <Link href="/" className="mb-14 group">
+                    <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center group-hover:rotate-12 transition-transform duration-500">
+                        <span className="text-xl font-black text-black leading-none">C.</span>
+                    </div>
                 </Link>
 
-                <ul className="space-y-10 flex-1 flex flex-col items-center">
+                <nav className="flex-1 flex flex-col items-center space-y-6">
                     {links.map((link) => {
                         const Icon = link.icon;
                         const isActive = pathname === link.href;
                         return (
-                            <li key={link.href}>
-                                <Link
-                                    href={link.href}
-                                    className={cn(
-                                        "flex items-center justify-center p-3 rounded-2xl transition-all duration-300 group relative",
-                                        isActive
-                                            ? "bg-white text-black shadow-lg scale-110"
-                                            : "text-secondary hover:text-white"
-                                    )}
-                                >
-                                    <Icon className={cn("h-6 w-6 transition-all", isActive ? "stroke-[2.5px]" : "stroke-[1.5px]")} />
-                                    {isActive && (
-                                        <div className="absolute -right-2 w-1.5 h-1.5 bg-white rounded-full shadow-glow"></div>
-                                    )}
-                                </Link>
-                            </li>
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                className={cn(
+                                    "relative flex flex-col items-center justify-center p-4 rounded-[24px] transition-all duration-500 group",
+                                    isActive
+                                        ? "bg-white text-black scale-110 shadow-[0_0_20px_rgba(255,255,255,0.15)]"
+                                        : "text-gray-500 hover:text-white hover:bg-white/5"
+                                )}
+                            >
+                                <Icon size={22} className={cn("transition-all duration-500", isActive ? "stroke-[2.5px]" : "stroke-[1.5px] group-hover:scale-110")} />
+                                <span className={cn(
+                                    "absolute left-24 px-3 py-1.5 rounded-xl bg-black text-white text-[10px] font-bold uppercase tracking-widest opacity-0 -translate-x-4 pointer-events-none transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 border border-white/10 whitespace-nowrap z-50",
+                                    isActive && "hidden"
+                                )}>
+                                    {link.label}
+                                </span>
+                            </Link>
                         );
                     })}
-                </ul>
+                </nav>
 
-                <div className="mt-auto space-y-8 flex flex-col items-center">
+                <div className="mt-auto flex flex-col items-center space-y-4">
                     <Link href="/settings" className={cn(
-                        "p-3 rounded-2xl transition-all hover:bg-white/5 group",
-                        pathname === '/settings' ? "bg-white text-black" : "text-secondary"
+                        "p-4 rounded-[24px] transition-all duration-500 group relative",
+                        pathname === '/settings' ? "bg-white text-black" : "text-gray-500 hover:text-white hover:bg-white/5"
                     )}>
-                        <Settings className="h-6 w-6" />
+                        <Settings size={22} className="group-hover:rotate-45 transition-transform duration-500" />
+                        <span className="absolute left-24 px-3 py-1.5 rounded-xl bg-black text-white text-[10px] font-bold uppercase tracking-widest opacity-0 -translate-x-4 pointer-events-none transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 border border-white/10 whitespace-nowrap z-50">
+                            Settings
+                        </span>
                     </Link>
                     <button
                         onClick={async () => {
                             await logout();
                         }}
-                        className="p-3 rounded-2xl text-secondary hover:text-red-400 transition-all"
+                        className="p-4 rounded-[24px] text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-500 group relative"
                     >
-                        <LogOut className="h-6 w-6" />
+                        <LogOut size={22} />
+                        <span className="absolute left-24 px-3 py-1.5 rounded-xl bg-red-600 text-white text-[10px] font-bold uppercase tracking-widest opacity-0 -translate-x-4 pointer-events-none transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 whitespace-nowrap z-50">
+                            Logout
+                        </span>
                     </button>
                 </div>
             </div>
         </aside>
     );
-};
+}

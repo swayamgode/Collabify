@@ -5,153 +5,144 @@ import Link from 'next/link';
 import { getBrandStats } from '@/lib/actions/stats';
 import { getBrandActivity } from '@/lib/actions/activity';
 import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
+import { cn } from '@/lib/utils';
 
 export default async function BrandDashboardPage() {
     const stats = await getBrandStats();
     const activity = await getBrandActivity();
 
     return (
-        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex items-center justify-between">
+        <div className="space-y-12 max-w-7xl mx-auto">
+            {/* Hero Heading */}
+            <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight">Dashboard Overview</h2>
-                    <p className="text-secondary mt-1">Here's what's happening with your campaigns today.</p>
+                    <h2 className="text-4xl font-bold tracking-tight text-gradient-premium">Dashboard Overview</h2>
+                    <p className="text-gray-500 font-medium mt-2">Scale your reach with real-time intelligence.</p>
                 </div>
                 <Link href="/brand/create-campaign">
-                    <Button className="gap-2 px-8 h-12 text-base shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all hover:-translate-y-0.5">
+                    <Button size="lg" className="h-14 px-10 gap-2 shadow-glow hover:-translate-y-1 transition-all">
                         <Plus size={20} />
                         New Campaign
                     </Button>
                 </Link>
             </div>
 
+            {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <Card className="hover:scale-[1.02] transition-transform shadow-sm hover:shadow-md border-primary/5 bg-gradient-to-br from-white to-blue-50/30">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-secondary uppercase tracking-widest">Active Campaigns</CardTitle>
-                        <div className="p-3 bg-blue-100 rounded-2xl text-blue-600 shadow-sm">
-                            <Briefcase size={20} />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-5xl font-bold tracking-tight text-foreground">{stats?.activeCampaigns || 0}</div>
-                        <p className="text-sm text-secondary mt-3 flex items-center gap-1.5 font-medium">
-                            <span className="text-green-600 bg-green-100 px-1.5 py-0.5 rounded text-xs">+2 this week</span>
-                            Active now
-                        </p>
-                    </CardContent>
-                </Card>
-
-                <Card className="hover:scale-[1.02] transition-transform shadow-sm hover:shadow-md border-primary/5 bg-gradient-to-br from-white to-purple-50/30">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-secondary uppercase tracking-widest">Total Applications</CardTitle>
-                        <div className="p-3 bg-purple-100 rounded-2xl text-purple-600 shadow-sm">
-                            <Users size={20} />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-5xl font-bold tracking-tight text-foreground">{stats?.totalApps || 0}</div>
-                        <p className="text-sm text-secondary mt-3 flex items-center gap-1.5 font-medium">
-                            <span className="text-green-600 bg-green-100 px-1.5 py-0.5 rounded text-xs">+12%</span>
-                            from last month
-                        </p>
-                    </CardContent>
-                </Card>
-
-                <Card className="hover:scale-[1.02] transition-transform shadow-sm hover:shadow-md border-primary/5 bg-gradient-to-br from-white to-green-50/30">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-secondary uppercase tracking-widest">Total Budget Spent</CardTitle>
-                        <div className="p-3 bg-green-100 rounded-2xl text-green-600 shadow-sm">
-                            <DollarSign size={20} />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-5xl font-bold tracking-tight text-foreground">${stats?.spent?.toLocaleString() || '0'}</div>
-                        <p className="text-sm text-secondary mt-3 flex items-center gap-1.5 font-medium">
-                            <span className="text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded text-xs">All time</span>
-                            Investment
-                        </p>
-                    </CardContent>
-                </Card>
+                {[
+                    { label: 'Active Campaigns', value: stats?.activeCampaigns || 0, icon: Briefcase, color: 'blue', plus: '+2 this week' },
+                    { label: 'Total Applications', value: stats?.totalApps || 0, icon: Users, color: 'purple', plus: '+12% month' },
+                    { label: 'Budget Deployed', value: `$${stats?.spent?.toLocaleString() || '0'}`, icon: DollarSign, color: 'green', plus: 'All-time' }
+                ].map((stat, i) => (
+                    <Card key={i} className="group border-none shadow-premium hover:shadow-premium-hover card-hover bg-white overflow-hidden">
+                        <CardHeader className="flex flex-row items-center justify-between pb-4">
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{stat.label}</span>
+                            <div className={cn("p-2.5 rounded-xl transition-all duration-500 group-hover:scale-110", {
+                                "bg-blue-50 text-blue-600": stat.color === 'blue',
+                                "bg-purple-50 text-purple-600": stat.color === 'purple',
+                                "bg-green-50 text-green-600": stat.color === 'green',
+                            })}>
+                                <stat.icon size={18} />
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-5xl font-bold tracking-tighter mb-4">{stat.value}</div>
+                            <div className="flex items-center gap-2">
+                                <span className={cn("px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest", {
+                                    "bg-blue-100/50 text-blue-700": stat.color === 'blue',
+                                    "bg-purple-100/50 text-purple-700": stat.color === 'purple',
+                                    "bg-green-100/50 text-green-700": stat.color === 'green',
+                                })}>
+                                    {stat.plus}
+                                </span>
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Performance</span>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 space-y-8">
-                    <ActivityFeed items={activity} role="brand" />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                {/* Main Content Area */}
+                <div className="lg:col-span-2 space-y-10">
+                    <div className="relative group">
+                        <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+                        <ActivityFeed items={activity} role="brand" />
+                        <div className="absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+                    </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <Link href="/brand/influencers" className="block group">
-                            <Card className="h-full hover:border-black/20 transition-all cursor-pointer group-hover:shadow-lg">
-                                <CardContent className="p-6 flex items-center justify-between">
-                                    <div>
-                                        <h3 className="font-bold text-lg mb-1 group-hover:text-blue-600 transition-colors">Find Influencers</h3>
-                                        <p className="text-secondary text-sm">Discover top talent for your brand.</p>
+                            <Card className="p-8 border-none shadow-premium hover:shadow-premium-hover card-hover group cursor-pointer h-full">
+                                <div className="flex justify-between items-start">
+                                    <div className="space-y-1">
+                                        <h3 className="text-xl font-bold tracking-tight group-hover:text-blue-600 transition-colors">Find Influencers</h3>
+                                        <p className="text-sm text-gray-500 font-medium">Discover verified talent.</p>
                                     </div>
-                                    <div className="p-3 bg-gray-50 rounded-full group-hover:bg-blue-50 transition-colors">
-                                        <ArrowRight className="text-gray-400 group-hover:text-blue-600 transition-colors" />
+                                    <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-blue-50 group-hover:text-blue-600 transition-all">
+                                        <ArrowRight size={18} />
                                     </div>
-                                </CardContent>
+                                </div>
                             </Card>
                         </Link>
 
                         <Link href="/brand/campaigns" className="block group">
-                            <Card className="h-full hover:border-black/20 transition-all cursor-pointer group-hover:shadow-lg">
-                                <CardContent className="p-6 flex items-center justify-between">
-                                    <div>
-                                        <h3 className="font-bold text-lg mb-1 group-hover:text-purple-600 transition-colors">Manage Campaigns</h3>
-                                        <p className="text-secondary text-sm">Review applications & stats.</p>
+                            <Card className="p-8 border-none shadow-premium hover:shadow-premium-hover card-hover group cursor-pointer h-full">
+                                <div className="flex justify-between items-start">
+                                    <div className="space-y-1">
+                                        <h3 className="text-xl font-bold tracking-tight group-hover:text-purple-600 transition-colors">Manage Campaigns</h3>
+                                        <p className="text-sm text-gray-500 font-medium">Review applications & stats.</p>
                                     </div>
-                                    <div className="p-3 bg-gray-50 rounded-full group-hover:bg-purple-50 transition-colors">
-                                        <ArrowRight className="text-gray-400 group-hover:text-purple-600 transition-colors" />
+                                    <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-purple-50 group-hover:text-purple-600 transition-all">
+                                        <ArrowRight size={18} />
                                     </div>
-                                </CardContent>
+                                </div>
                             </Card>
                         </Link>
                     </div>
                 </div>
 
-                <div className="space-y-6">
-                    <Card className="h-fit">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <TrendingUp size={20} className="text-blue-600" />
-                                Market Insights
-                            </CardTitle>
-                            <CardDescription>AI-powered suggestions.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="p-5 bg-gradient-to-br from-blue-50 to-indigo-50/50 rounded-2xl border border-blue-100 relative overflow-hidden group">
-                                <div className="absolute right-0 top-0 w-24 h-24 bg-blue-200/20 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
-                                <h4 className="font-bold text-blue-900 mb-2">🔥 Trending: Authenticity</h4>
-                                <p className="text-sm text-blue-800/80 leading-relaxed">
-                                    Audiences are engaging 40% more with "day in the life" style content this week compared to polished ads.
-                                </p>
+                {/* Sidebar Content Area */}
+                <div className="space-y-8">
+                    <Card className="border-none shadow-premium p-8 space-y-8">
+                        <div>
+                            <div className="flex items-center gap-2 mb-2">
+                                <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Market Insights</span>
                             </div>
+                            <h3 className="text-lg font-bold">AI Recommendations</h3>
+                        </div>
 
+                        <div className="p-6 bg-gray-50/50 rounded-3xl border border-gray-100 group">
+                            <h4 className="font-bold text-sm mb-2 flex items-center gap-2">
+                                <TrendingUp size={16} className="text-blue-600" />
+                                Trending: Authenticity
+                            </h4>
+                            <p className="text-xs text-gray-500 leading-relaxed font-medium">
+                                Audiences are engaging 40% more with "day in the life" content this week. Consider updating your campaign briefs.
+                            </p>
+                        </div>
+
+                        <div className="space-y-4 pt-4 border-t border-gray-100">
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Rising Talent</span>
                             <div className="space-y-4">
-                                <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Recommended Channels</h4>
-                                <div className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer border border-transparent hover:border-gray-100">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-gray-200" />
-                                        <div>
-                                            <p className="font-bold text-sm">TechReviewer_99</p>
-                                            <p className="text-xs text-secondary">Tech • 105K</p>
+                                {[
+                                    { name: 'TechReviewer_99', niche: 'Tech', followers: '105K' },
+                                    { name: 'SarahVlogs', niche: 'Lifestyle', followers: '450K' }
+                                ].map((creator, i) => (
+                                    <div key={i} className="flex items-center justify-between group cursor-pointer">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-gray-100 border border-gray-200" />
+                                            <div>
+                                                <p className="font-bold text-sm">{creator.name}</p>
+                                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{creator.niche} • {creator.followers}</p>
+                                            </div>
                                         </div>
+                                        <Button variant="ghost" size="sm" className="h-8 group-hover:bg-black group-hover:text-white transition-all">View</Button>
                                     </div>
-                                    <Button size="sm" variant="outline" className="h-8">View</Button>
-                                </div>
-                                <div className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer border border-transparent hover:border-gray-100">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-gray-200" />
-                                        <div>
-                                            <p className="font-bold text-sm">SarahVlogs</p>
-                                            <p className="text-xs text-secondary">Lifestyle • 450K</p>
-                                        </div>
-                                    </div>
-                                    <Button size="sm" variant="outline" className="h-8">View</Button>
-                                </div>
+                                ))}
                             </div>
-                        </CardContent>
+                        </div>
                     </Card>
                 </div>
             </div>

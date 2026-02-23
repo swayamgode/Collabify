@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #F5F5F7;
+  --color-background: #F8F9FA;
   --color-foreground: #000000;
 
   --color-card: #ffffff;
@@ -10,8 +10,8 @@
   --color-sidebar: #050505;
   --color-sidebar-foreground: #ffffff;
 
-  --color-muted: #f0f0f2;
-  --color-muted-foreground: #6b7280;
+  --color-muted: #f1f3f5;
+  --color-muted-foreground: #6c757d;
 
   --color-accent: #000000;
   --color-accent-foreground: #ffffff;
@@ -21,16 +21,17 @@
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-  --radius-xl: 24px;
-  --shadow-premium: 0 8px 30px rgba(0, 0, 0, 0.04);
-  --shadow-premium-hover: 0 8px 30px rgba(0, 0, 0, 0.08);
+  --radius-xl: 28px;
+  --shadow-premium: 0 4px 20px rgba(0, 0, 0, 0.03), 0 0 1px rgba(0, 0, 0, 0.05);
+  --shadow-premium-hover: 0 10px 40px rgba(0, 0, 0, 0.05), 0 0 1px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 0 20px rgba(0, 0, 0, 0.05);
 }
 
 :root {
-  --background: #F5F5F7;
+  --background: #F8F9FA;
   --foreground: #000000;
   --primary: #000000;
-  --secondary: #8E8e93;
+  --secondary: #8E8E93;
 }
 
 body {
@@ -39,6 +40,7 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
 }
 
 @layer base {
@@ -51,8 +53,8 @@ body {
 
   /* Webkit Scrollbar */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
 
   ::-webkit-scrollbar-track {
@@ -60,13 +62,13 @@ body {
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 20px;
     transition: background 0.3s ease;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.15);
   }
 
   h1,
@@ -81,47 +83,56 @@ body {
 
 @layer utilities {
   .glass {
-    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-sm;
+    @apply bg-white/60 backdrop-blur-2xl border border-white/40 shadow-premium;
   }
 
   .glass-dark {
-    @apply bg-black/90 backdrop-blur-xl border border-white/10 shadow-xl;
+    @apply bg-black/80 backdrop-blur-2xl border border-white/5 shadow-2xl;
   }
 
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-br from-black via-black/80 to-black/60;
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-black via-black/80 to-gray-500;
   }
 
-  .text-gradient-primary {
-    @apply bg-clip-text text-transparent bg-gradient-to-br from-black to-gray-600;
+  .text-gradient-premium {
+    @apply bg-clip-text text-transparent bg-gradient-to-tr from-gray-900 via-black to-gray-600;
   }
 
-  .bg-gradient-mesh {
+  .bg-mesh {
     background-image:
-      radial-gradient(at 0% 0%, rgba(0, 0, 0, 0.03) 0, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(142, 142, 147, 0.05) 0, transparent 50%);
+      radial-gradient(at 0% 0%, rgba(0, 0, 0, 0.02) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(0, 0, 0, 0.02) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(0, 0, 0, 0.02) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(0, 0, 0, 0.02) 0px, transparent 50%);
   }
 
-  .border-gradient {
-    border: 1px solid transparent;
-    background: linear-gradient(var(--card), var(--card)) padding-box,
-      linear-gradient(to right, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02)) border-box;
+  .border-premium {
+    @apply border border-gray-100/80;
   }
 
-  .rounded-design {
-    border-radius: 24px;
+  .card-hover {
+    @apply hover:-translate-y-1 transition-all duration-500 ease-out;
   }
 
-  .card-premium {
-    @apply bg-white border border-gray-100 shadow-premium hover:shadow-premium-hover transition-all duration-300;
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
   }
 
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+
+    100% {
+      transform: translateY(0px);
+    }
   }
 
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  .mask-radial {
+    mask-image: radial-gradient(circle at center, black, transparent 80%);
   }
 }
