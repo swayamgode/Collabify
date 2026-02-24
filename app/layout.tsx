@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Social Media Connector",
-  description: "Platform for Influencers and Brand Managers",
+  title: "Collabify | The New Standard of Influence",
+  description: "Connect visionary brands with creators who define culture. Intelligence-driven influence, delivered at scale.",
 };
 
 import { ChatBot } from "@/components/ChatBot";
