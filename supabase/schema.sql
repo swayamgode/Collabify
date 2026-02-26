@@ -6,9 +6,11 @@ CREATE TABLE profiles (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   full_name TEXT,
   avatar_url TEXT,
-  role TEXT CHECK (role IN ('brand', 'influencer')),
+  role TEXT CHECK (role IN ('brand', 'influencer', 'admin')),
   bio TEXT,
-  website TEXT
+  website TEXT,
+  is_verified BOOLEAN DEFAULT FALSE,
+  verification_status TEXT DEFAULT 'unverified' CHECK (verification_status IN ('unverified', 'pending', 'verified', 'rejected'))
 );
 
 -- Brands table (Extensions for brands)

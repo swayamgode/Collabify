@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Search, Filter, Instagram, Youtube, Twitter, Star, Mail, Globe, Loader2, CheckCircle2 } from 'lucide-react';
+import { Search, Filter, Instagram, Youtube, Twitter, Star, Mail, Globe, Loader2, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { searchExternalInfluencers } from '@/lib/actions/influencers';
 import { sendConnectionRequest } from '@/lib/actions/connections';
 import { toast } from 'sonner';
@@ -142,7 +142,14 @@ export default function InfluencerDiscoveryClient({ initialInfluencers }: { init
                                 </div>
                             </div>
                             <CardHeader className="text-center pt-8">
-                                <CardTitle className="text-xl font-black">{inf.profiles?.full_name}</CardTitle>
+                                <CardTitle className="text-xl font-black flex items-center justify-center gap-2">
+                                    {inf.profiles?.full_name}
+                                    {inf.profiles?.is_verified && (
+                                        <div className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-white shadow-sm">
+                                            <ShieldCheck size={12} strokeWidth={3} />
+                                        </div>
+                                    )}
+                                </CardTitle>
                                 <p className="text-sm font-bold text-indigo-600/70">{inf.social_handle}</p>
                             </CardHeader>
                             <CardContent className="flex-1 px-6">

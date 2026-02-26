@@ -114,3 +114,25 @@ export async function getProfileData() {
 
     return { profile, roleData }
 }
+
+export async function requestVerification() {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) return { error: 'Unauthorized' }
+
+    const { error } = await supabase
+        .from('profiles')
+        .update({
+            verification_status: 'pending',
+            updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id)
+
+    if (error) return { error: error.message }
+
+    revalidatePath('/settings')
+    revalidatePath('/brand')
+    revalidatePath('/influencer')
+    return { success: true }
+}

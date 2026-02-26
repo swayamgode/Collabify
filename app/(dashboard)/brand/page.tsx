@@ -4,15 +4,21 @@ import { Plus, Briefcase, Users, DollarSign, ArrowRight, TrendingUp } from 'luci
 import Link from 'next/link';
 import { getBrandStats } from '@/lib/actions/stats';
 import { getBrandActivity } from '@/lib/actions/activity';
+import { getProfileData } from '@/lib/actions/profiles';
 import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
+import { VerificationBanner } from '@/components/dashboard/VerificationBanner';
 import { cn } from '@/lib/utils';
 
 export default async function BrandDashboardPage() {
     const stats = await getBrandStats();
     const activity = await getBrandActivity();
+    const profileData = await getProfileData();
 
     return (
         <div className="space-y-12 max-w-7xl mx-auto">
+            {/* Verification Banner */}
+            <VerificationBanner status={profileData?.profile?.verification_status} />
+
             {/* Hero Heading */}
             <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
                 <div>

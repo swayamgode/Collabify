@@ -11,14 +11,21 @@ import {
     Search,
     Settings,
     LogOut,
-    BarChart2
+    BarChart2,
+    Shield
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logout } from '@/app/(auth)/actions';
+import { Profile } from '@/lib/types/database';
 
-export function Sidebar() {
+interface SidebarProps {
+    user?: Profile | null;
+}
+
+export function Sidebar({ user }: SidebarProps) {
     const pathname = usePathname();
     const isBrand = pathname?.includes('/brand');
+    const isAdmin = user?.role === 'admin';
 
     const brandLinks = [
         { href: '/brand', label: 'Dashboard', icon: LayoutDashboard },
@@ -36,6 +43,11 @@ export function Sidebar() {
     ];
 
     const links = isBrand ? brandLinks : influencerLinks;
+
+    // Add Admin link if user is admin
+    if (isAdmin) {
+        links.unshift({ href: '/admin', label: 'Admin', icon: Shield });
+    }
 
     return (
         <aside className="fixed left-6 top-6 bottom-6 z-40 w-24 bg-black rounded-[40px] transition-all hidden md:block overflow-hidden shadow-2xl">

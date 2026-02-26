@@ -3,9 +3,11 @@ export type Profile = {
     updated_at?: string;
     full_name?: string;
     avatar_url?: string;
-    role: 'brand' | 'influencer';
+    role: 'brand' | 'influencer' | 'admin';
     bio?: string;
     website?: string;
+    is_verified?: boolean;
+    verification_status?: 'unverified' | 'pending' | 'verified' | 'rejected';
 };
 
 export type Brand = {

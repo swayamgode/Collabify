@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, Search, Building2, User } from 'lucide-react';
+import { Bell, Search, Building2, User, ShieldCheck } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Profile } from '@/lib/types/database';
 
@@ -27,7 +27,14 @@ export function Topbar({ user }: TopbarProps) {
                 <div className="z-10 flex items-center gap-4">
                     <div>
                         <div className="flex items-center gap-3 mb-1">
-                            <h2 className="text-3xl font-bold tracking-tight text-foreground">Hello {userName}!</h2>
+                            <div className="flex items-center gap-2">
+                                <h2 className="text-3xl font-bold tracking-tight text-foreground">Hello {userName}!</h2>
+                                {user?.is_verified && (
+                                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white shadow-glow-blue border-2 border-white animate-in zoom-in duration-500">
+                                        <ShieldCheck size={14} strokeWidth={3} />
+                                    </div>
+                                )}
+                            </div>
                             <span className="px-3 py-1 rounded-full text-xs font-semibold bg-black text-white flex items-center gap-1.5">
                                 {isBrand ? <Building2 size={12} /> : <User size={12} />}
                                 {role}

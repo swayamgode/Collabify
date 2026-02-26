@@ -4,15 +4,21 @@ import { Search, Briefcase, DollarSign, ArrowRight, Star, TrendingUp } from 'luc
 import Link from 'next/link';
 import { getInfluencerStats } from '@/lib/actions/stats';
 import { getInfluencerActivity } from '@/lib/actions/activity';
+import { getProfileData } from '@/lib/actions/profiles';
 import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
+import { VerificationBanner } from '@/components/dashboard/VerificationBanner';
 import { cn } from '@/lib/utils';
 
 export default async function InfluencerDashboardPage() {
     const stats = await getInfluencerStats();
     const activity = await getInfluencerActivity();
+    const profileData = await getProfileData();
 
     return (
         <div className="space-y-12 max-w-7xl mx-auto">
+            {/* Verification Banner */}
+            <VerificationBanner status={profileData?.profile?.verification_status} />
+
             {/* Heading */}
             <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
                 <div>
