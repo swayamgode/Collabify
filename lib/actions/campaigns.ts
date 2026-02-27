@@ -61,7 +61,9 @@ export async function createCampaign(formData: FormData) {
     }
 }
 
-export async function getCampaigns(filters?: { search?: string }) {
+import { cache } from 'react'
+
+export const getCampaigns = cache(async function getCampaigns(filters?: { search?: string }) {
     try {
         const supabase = await createClient()
 
@@ -93,7 +95,7 @@ export async function getCampaigns(filters?: { search?: string }) {
 
         return data
     } catch (error) {
-        console.warn('Supabase offline, returning mock campaigns');
+        console.warn('Supabase offline or error, returning mock campaigns');
         const mockCampaigns = [
             {
                 id: 'mock-1',
@@ -130,9 +132,9 @@ export async function getCampaigns(filters?: { search?: string }) {
 
         return mockCampaigns;
     }
-}
+})
 
-export async function getBrandCampaigns(brandId: string) {
+export const getBrandCampaigns = cache(async function getBrandCampaigns(brandId: string) {
     try {
         const supabase = await createClient()
 
@@ -153,10 +155,10 @@ export async function getBrandCampaigns(brandId: string) {
         // Map to include a simple count property
         return data.map(campaign => ({
             ...campaign,
-            application_count: campaign.applications?.[0]?.count || 0
+            application_count: (campaign.applications as any)?.[0]?.count || 0
         }))
     } catch (error) {
-        console.warn('Supabase offline, returning mock brand campaigns');
+        console.warn('Supabase offline or error, returning mock brand campaigns');
         return [
             {
                 id: 'mock-1',
@@ -171,4 +173,4 @@ export async function getBrandCampaigns(brandId: string) {
             }
         ];
     }
-}
+})

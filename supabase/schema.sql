@@ -75,3 +75,15 @@ CREATE TABLE payments (
   status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'failed', 'refunded')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Indices for performance
+CREATE INDEX idx_profiles_role ON profiles(role);
+CREATE INDEX idx_campaigns_brand_id ON campaigns(brand_id);
+CREATE INDEX idx_campaigns_status ON campaigns(status);
+CREATE INDEX idx_applications_campaign_id ON applications(campaign_id);
+CREATE INDEX idx_applications_influencer_id ON applications(influencer_id);
+CREATE INDEX idx_applications_status ON applications(status);
+CREATE INDEX idx_connection_requests_brand_id ON connection_requests(brand_id);
+CREATE INDEX idx_connection_requests_influencer_id ON connection_requests(influencer_id);
+CREATE INDEX idx_payments_campaign_id ON payments(campaign_id);
+CREATE INDEX idx_payments_status ON payments(status);

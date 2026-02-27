@@ -3,7 +3,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { findYouTubeChannelId, getYouTubeChannelStats } from '@/lib/youtube'
 
-export async function getInfluencers(filters?: { niche?: string, platform?: string, search?: string }) {
+import { cache } from 'react'
+
+export const getInfluencers = cache(async function getInfluencers(filters?: { niche?: string, platform?: string, search?: string }) {
     try {
         const supabase = await createClient()
 
@@ -43,7 +45,7 @@ export async function getInfluencers(filters?: { niche?: string, platform?: stri
 
         return data
     } catch (error) {
-        console.warn('Supabase offline, returning mock influencers');
+        console.warn('Supabase offline or error, returning mock influencers');
         const mockInfluencers = [
             {
                 id: 'mock-inf-1',
@@ -86,9 +88,9 @@ export async function getInfluencers(filters?: { niche?: string, platform?: stri
 
         return mockInfluencers;
     }
-}
+})
 
-export async function searchExternalInfluencers(query: string) {
+export const searchExternalInfluencers = cache(async function searchExternalInfluencers(query: string) {
     if (!query || query.length < 3) return [];
 
     try {
@@ -116,4 +118,4 @@ export async function searchExternalInfluencers(query: string) {
         console.error('Error in searchExternalInfluencers:', error);
         return [];
     }
-}
+})

@@ -12,7 +12,9 @@ export interface ActivityItem {
     link?: string;
 }
 
-export async function getBrandActivity(): Promise<ActivityItem[]> {
+import { cache } from 'react';
+
+export const getBrandActivity = cache(async function getBrandActivity(): Promise<ActivityItem[]> {
     try {
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
@@ -49,40 +51,47 @@ export async function getBrandActivity(): Promise<ActivityItem[]> {
             ];
         }
 
-        // Get brand's recent applications received
-        const { data: applications } = await supabase
-            .from('applications')
-            .select(`
-                id,
-                status,
-                created_at:applied_at,
-                campaign:campaigns!inner(id, title, brand_id),
-                influencer:influencers(social_handle, id)
-            `)
-            .eq('campaign.brand_id', user.id)
-            .order('applied_at', { ascending: false })
-            .limit(5);
+        // Parallelize database queries
+        const [applicationsData, campaignsData, connectionsData] = await Promise.all([
+            // Get brand's recent applications received
+            supabase
+                .from('applications')
+                .select(`
+                    id,
+                    status,
+                    created_at:applied_at,
+                    campaign:campaigns!inner(id, title, brand_id),
+                    influencer:influencers(social_handle, id)
+                `)
+                .eq('campaign.brand_id', user.id)
+                .order('applied_at', { ascending: false })
+                .limit(5),
 
-        // Get recent campaigns created
-        const { data: campaigns } = await supabase
-            .from('campaigns')
-            .select('id, title, status, created_at')
-            .eq('brand_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(5);
+            // Get recent campaigns created
+            supabase
+                .from('campaigns')
+                .select('id, title, status, created_at')
+                .eq('brand_id', user.id)
+                .order('created_at', { ascending: false })
+                .limit(5),
 
-        // Get connection requests
-        const { data: connections } = await supabase
-            .from('connection_requests')
-            .select(`
-                id,
-                status,
-                created_at,
-                influencer:influencers(social_handle, id, profiles(full_name))
-            `)
-            .eq('brand_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(5);
+            // Get connection requests
+            supabase
+                .from('connection_requests')
+                .select(`
+                    id,
+                    status,
+                    created_at,
+                    influencer:influencers(social_handle, id, profiles(full_name))
+                `)
+                .eq('brand_id', user.id)
+                .order('created_at', { ascending: false })
+                .limit(5)
+        ]);
+
+        const applications = applicationsData.data;
+        const campaigns = campaignsData.data;
+        const connections = connectionsData.data;
 
         const activity: ActivityItem[] = [];
 
@@ -136,12 +145,12 @@ export async function getBrandActivity(): Promise<ActivityItem[]> {
             new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
         ).slice(0, 5);
     } catch (error) {
-        // ... (returning mock in catch block)
+        console.error('Error fetching brand activity:', error);
         return [];
     }
-}
+})
 
-export async function getInfluencerActivity(): Promise<ActivityItem[]> {
+export const getInfluencerActivity = cache(async function getInfluencerActivity(): Promise<ActivityItem[]> {
     try {
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
@@ -169,31 +178,37 @@ export async function getInfluencerActivity(): Promise<ActivityItem[]> {
             ];
         }
 
-        // Get applications submitted/updated
-        const { data: applications } = await supabase
-            .from('applications')
-            .select(`
-                id,
-                status,
-                created_at:applied_at,
-                campaign:campaigns(title, brand:brands(company_name))
-            `)
-            .eq('influencer_id', user.id)
-            .order('applied_at', { ascending: false })
-            .limit(10);
+        // Parallelize database queries
+        const [applicationsData, connectionsData] = await Promise.all([
+            // Get applications submitted/updated
+            supabase
+                .from('applications')
+                .select(`
+                    id,
+                    status,
+                    created_at:applied_at,
+                    campaign:campaigns(title, brand:brands(company_name))
+                `)
+                .eq('influencer_id', user.id)
+                .order('applied_at', { ascending: false })
+                .limit(10),
 
-        // Get connection requests
-        const { data: connections } = await supabase
-            .from('connection_requests')
-            .select(`
-                id,
-                status,
-                created_at,
-                brand:brands(company_name, id)
-            `)
-            .eq('influencer_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(10);
+            // Get connection requests
+            supabase
+                .from('connection_requests')
+                .select(`
+                    id,
+                    status,
+                    created_at,
+                    brand:brands(company_name, id)
+                `)
+                .eq('influencer_id', user.id)
+                .order('created_at', { ascending: false })
+                .limit(10)
+        ]);
+
+        const applications = applicationsData.data;
+        const connections = connectionsData.data;
 
         const activity: ActivityItem[] = [];
 
@@ -240,6 +255,7 @@ export async function getInfluencerActivity(): Promise<ActivityItem[]> {
             new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
         ).slice(0, 10);
     } catch (error) {
+        console.error('Error fetching influencer activity:', error);
         return [];
     }
-}
+})

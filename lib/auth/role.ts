@@ -12,39 +12,17 @@ export async function getUserRole(): Promise<'brand' | 'influencer' | null> {
     return null;
 }
 
+import { getProfileData } from '@/lib/actions/profiles';
+
 /**
  * Get the current user's profile with role
  */
 export async function getCurrentUserProfile() {
-    // Return mock profile for dev/demo mode
-    const mockUser = {
-        id: 'mock-user-123',
-        full_name: 'Demo User',
-        email: 'demo@collabify.com',
-        role: 'brand',     // This is the default mock role
-        avatar_url: null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-    };
-
     try {
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (!user) {
-            return mockUser;
-        }
-
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single();
-
-        return profile || mockUser;
+        const data = await getProfileData();
+        return data?.profile || null;
     } catch (error) {
-        // console.warn('Supabase error:', error);
-        return mockUser;
+        return null;
     }
 }
 

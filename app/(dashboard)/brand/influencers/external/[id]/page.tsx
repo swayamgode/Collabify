@@ -6,8 +6,12 @@ import Link from 'next/link';
 
 export default async function ExternalInfluencerProfile({ params }: { params: Promise<{ id: string }> }) {
     const { id: channelId } = await params;
-    const stats = await getYouTubeChannelStats(channelId);
-    const videos = await getYouTubeRecentVideos(channelId);
+
+    // Parallelize YouTube API calls
+    const [stats, videos] = await Promise.all([
+        getYouTubeChannelStats(channelId),
+        getYouTubeRecentVideos(channelId)
+    ]);
 
     if (!stats) {
         return (

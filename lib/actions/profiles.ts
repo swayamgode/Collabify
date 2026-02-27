@@ -81,7 +81,9 @@ export async function updateBrandDetails(formData: FormData) {
     return { success: true }
 }
 
-export async function getProfileData() {
+import { cache } from 'react'
+
+export const getProfileData = cache(async function getProfileData() {
     try {
         const supabase = await createClient()
         const { data: { user } } = await supabase.auth.getUser()
@@ -123,10 +125,10 @@ export async function getProfileData() {
 
         return { profile, roleData }
     } catch (error) {
-        console.warn('Supabase offline, returning mock profile data');
+        console.warn('Supabase offline or error, returning mock profile data');
         return getMockProfile('brand');
     }
-}
+})
 
 function getMockProfile(role: 'brand' | 'influencer') {
     return {

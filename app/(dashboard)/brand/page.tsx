@@ -10,9 +10,12 @@ import { VerificationBanner } from '@/components/dashboard/VerificationBanner';
 import { cn } from '@/lib/utils';
 
 export default async function BrandDashboardPage() {
-    const stats = await getBrandStats();
-    const activity = await getBrandActivity();
-    const profileData = await getProfileData();
+    // parallelize data fetching to reduce page load time
+    const [stats, activity, profileData] = await Promise.all([
+        getBrandStats(),
+        getBrandActivity(),
+        getProfileData()
+    ]);
 
     return (
         <div className="space-y-12 max-w-7xl mx-auto">

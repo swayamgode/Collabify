@@ -46,7 +46,9 @@ export async function applyToCampaign(campaignId: string, message: string) {
     return { success: true, data }
 }
 
-export async function getInfluencerApplications() {
+import { cache } from 'react'
+
+export const getInfluencerApplications = cache(async function getInfluencerApplications() {
     try {
         const supabase = await createClient()
 
@@ -101,6 +103,7 @@ export async function getInfluencerApplications() {
 
         return data
     } catch (error) {
+        console.warn('Supabase offline or error, returning mock applications');
         return [
             {
                 id: 'mock-app-1',
@@ -126,7 +129,7 @@ export async function getInfluencerApplications() {
             }
         ];
     }
-}
+})
 
 export async function updateApplicationStatus(applicationId: string, status: 'approved' | 'rejected') {
     try {
@@ -151,7 +154,7 @@ export async function updateApplicationStatus(applicationId: string, status: 'ap
     }
 }
 
-export async function getCampaignWithApplications(campaignId: string) {
+export const getCampaignWithApplications = cache(async function getCampaignWithApplications(campaignId: string) {
     try {
         const supabase = await createClient()
 
@@ -177,6 +180,7 @@ export async function getCampaignWithApplications(campaignId: string) {
 
         return data
     } catch (error) {
+        console.warn('Supabase offline or error, returning mock campaign with applications');
         // Return mock details
         return {
             id: campaignId,
@@ -201,4 +205,4 @@ export async function getCampaignWithApplications(campaignId: string) {
             ]
         }
     }
-}
+})

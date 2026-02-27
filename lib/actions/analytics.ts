@@ -242,28 +242,17 @@ const MOCK_ANALYTICS: InfluencerAnalytics = {
 
 import { getYouTubeChannelStats, getYouTubeRecentVideos, findYouTubeChannelId } from '@/lib/youtube'
 
-export async function getInfluencerAnalytics(): Promise<InfluencerAnalytics> {
+import { getProfileData } from '@/lib/actions/profiles'
+import { cache } from 'react'
+
+export const getInfluencerAnalytics = cache(async function getInfluencerAnalytics(): Promise<InfluencerAnalytics> {
     try {
-        const supabase = await createClient()
-        const { data: { user } } = await supabase.auth.getUser()
+        // Use cached profile data which includes roleData
+        const { profile, roleData } = await getProfileData()
 
-        // Default to mock data if not logged in
-        if (!user) return MOCK_ANALYTICS
+        if (!profile || profile.role !== 'influencer') return MOCK_ANALYTICS
 
-        // Fetch user profile and influencer specific details
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single()
-
-        const { data: influencer } = await supabase
-            .from('influencers')
-            .select('*')
-            .eq('id', user.id)
-            .single()
-
-        if (!profile || !influencer) return MOCK_ANALYTICS
+        const influencer = roleData
 
         let analytics = {
             ...MOCK_ANALYTICS,
@@ -279,6 +268,7 @@ export async function getInfluencerAnalytics(): Promise<InfluencerAnalytics> {
             const channelId = await findYouTubeChannelId(influencer.social_handle)
 
             if (channelId) {
+                // Parallelize YouTube API calls
                 const [ytStats, ytVideos] = await Promise.all([
                     getYouTubeChannelStats(channelId),
                     getYouTubeRecentVideos(channelId, 5)
@@ -326,4 +316,4 @@ export async function getInfluencerAnalytics(): Promise<InfluencerAnalytics> {
         console.error('Error in getInfluencerAnalytics:', error)
         return MOCK_ANALYTICS
     }
-}
+})

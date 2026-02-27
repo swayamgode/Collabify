@@ -2,12 +2,13 @@
 
 import { createClient } from '@/lib/supabase/server'
 
-export async function getEarnings() {
+import { cache } from 'react'
+
+export const getEarnings = cache(async function getEarnings() {
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    // if (!user) return { total: 0, available: 0, pending: 0, transactions: [] }
     if (!user) {
       return {
         total: 500,
@@ -52,9 +53,9 @@ export async function getEarnings() {
       throw error; // Trigger catch block
     }
 
-    const total = payments.reduce((sum, p) => sum + Number(p.amount), 0)
-    const available = payments.filter(p => p.status === 'completed').reduce((sum, p) => sum + Number(p.amount), 0)
-    const pending = payments.filter(p => p.status === 'pending').reduce((sum, p) => sum + Number(p.amount), 0)
+    const total = payments.reduce((sum, p) => sum + Number(p.amount), 0) || 0
+    const available = payments.filter(p => p.status === 'completed').reduce((sum, p) => sum + Number(p.amount), 0) || 0
+    const pending = payments.filter(p => p.status === 'pending').reduce((sum, p) => sum + Number(p.amount), 0) || 0
 
     const transactions = payments.map(p => ({
       label: `Payment from ${p.campaigns?.brands?.company_name || 'Brand'}`,
@@ -65,6 +66,7 @@ export async function getEarnings() {
 
     return { total, available, pending, transactions }
   } catch (error) {
+    console.error('Error in getEarnings:', error);
     return {
       total: 500,
       available: 350,
@@ -85,4 +87,4 @@ export async function getEarnings() {
       ]
     }
   }
-}
+})
