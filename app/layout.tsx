@@ -15,6 +15,7 @@ export const metadata: Metadata = {
 
 import { ChatBot } from "@/components/ChatBot";
 import { Toaster } from "sonner";
+import { ConvexClientProvider } from "@/components/providers/ConvexClientProvider";
 
 export default function RootLayout({
   children,
@@ -24,9 +25,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} antialiased`} suppressHydrationWarning>
-        {children}
-        <Toaster position="top-center" richColors />
-        <ChatBot />
+        <ConvexClientProvider>
+          {children}
+          <Toaster position="top-center" richColors />
+          <ChatBot />
+        </ConvexClientProvider>
       </body>
     </html>
   );

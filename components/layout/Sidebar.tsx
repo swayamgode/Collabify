@@ -12,7 +12,8 @@ import {
     Settings,
     LogOut,
     BarChart2,
-    Shield
+    Shield,
+    ShoppingBag
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logout } from '@/app/(auth)/actions';
@@ -30,6 +31,7 @@ export function Sidebar({ user }: SidebarProps) {
     const brandLinks = [
         { href: '/brand', label: 'Dashboard', icon: LayoutDashboard },
         { href: '/brand/campaigns', label: 'Campaigns', icon: Briefcase },
+        { href: '/brand/products', label: 'Products', icon: ShoppingBag },
         { href: '/brand/create-campaign', label: 'Create', icon: PlusCircle },
         { href: '/brand/influencers', label: 'Search', icon: Users },
     ];
