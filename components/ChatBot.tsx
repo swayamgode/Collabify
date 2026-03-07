@@ -109,7 +109,7 @@ export const ChatBot = () => {
 
                             {error && (
                                 <div className="p-3 bg-red-50 text-red-500 text-xs rounded-xl border border-red-100 italic">
-                                    Make sure OPENAI_API_KEY is configured in your .env file.
+                                    The chat service is currently unavailable.
                                 </div>
                             )}
                         </div>
