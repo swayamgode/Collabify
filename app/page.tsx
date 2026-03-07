@@ -14,7 +14,8 @@ import {
   useScroll,
   useTransform,
   useMotionValue,
-  useSpring
+  useSpring,
+  AnimatePresence,
 } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { CustomCursor } from "@/components/landing-page/CustomCursor";
@@ -46,9 +47,18 @@ const features = [
   },
 ];
 
+interface Drop {
+  id: number;
+  x: number;
+  y: number;
+}
+
 export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
+  const [isRevealMode, setIsRevealMode] = useState(false);
+  const [drops, setDrops] = useState<Drop[]>([]);
+  const dropIdCounter = useRef(0);
 
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -58,27 +68,36 @@ export default function Home() {
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 50]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
 
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const springX = useSpring(mouseX, { stiffness: 60, damping: 25 });
-  const springY = useSpring(mouseY, { stiffness: 60, damping: 25 });
-
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
+
     const handleMouseMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
+      if (isRevealMode) {
+        const newDrop = {
+          id: dropIdCounter.current++,
+          x: e.clientX,
+          y: e.clientY
+        };
+
+        setDrops(prev => [...prev, newDrop]);
+
+        // Remove drop after 6 seconds (Persistence)
+        setTimeout(() => {
+          setDrops(prev => prev.filter(d => d.id !== newDrop.id));
+        }, 6000);
+      }
     };
+
     window.addEventListener("scroll", handleScroll);
     window.addEventListener("mousemove", handleMouseMove);
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [mouseX, mouseY]);
+  }, [isRevealMode]);
 
   return (
     <div className="flex flex-col min-h-screen bg-white text-black selection:bg-black selection:text-white antialiased overflow-x-hidden relative font-sans">
@@ -86,84 +105,138 @@ export default function Home() {
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; }
         .font-serif { font-family: 'Georgia', serif; }
+        
+        .heavy-fluid {
+           filter: url('#strong-gooey');
+        }
       `}</style>
+
+      {/* Strong Gooey Filter for even stronger liquid tension */}
+      <svg className="hidden">
+        <defs>
+          <filter id="strong-gooey">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="22" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 65 -32" result="goo" />
+            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+          </filter>
+        </defs>
+      </svg>
 
       <CustomCursor />
 
-      {/* Navigation - Pixel Perfect Match */}
       <header className="fixed top-0 left-0 right-0 z-[100] px-6 py-8 flex justify-center">
         <nav className={`flex items-center gap-1 px-1.5 py-1.5 ${scrolled ? "bg-white/90 backdrop-blur-xl shadow-lg border border-black/5" : "bg-transparent"} rounded-full transition-all duration-300`}>
           <Link href="/" className="px-6 py-2 bg-black text-white text-sm font-bold rounded-full">Home</Link>
           <Link href="#" className="px-4 py-2 text-sm font-bold text-black/60 hover:text-black transition-colors">Contact</Link>
           <Link href="#" className="px-4 py-2 text-sm font-bold text-black/60 hover:text-black transition-colors">Influencers</Link>
           <Link href="#" className="px-4 py-2 text-sm font-bold text-black/60 hover:text-black transition-colors mr-4">About</Link>
-
           <div className="flex items-center gap-2 ml-4">
             <Link href="/login" className="px-4 py-2 text-sm font-bold text-black">Login</Link>
-            <Link href="/signup" className="px-6 py-2 bg-black text-white text-sm font-bold rounded-full transition-transform hover:scale-105 active:scale-95">Get Started</Link>
+            <Link href="/signup" className="px-6 py-2 bg-black text-white text-sm font-bold rounded-full transition-transform hover:scale-105">Get Started</Link>
           </div>
         </nav>
       </header>
 
       <main className="flex-1">
-        {/* Exact Hero Section - Matching Text Size & Font Weight */}
-        <section ref={heroRef} className="pt-64 pb-32 px-6 relative flex flex-col items-center min-h-[90vh]">
+        <section ref={heroRef} className="relative pt-64 pb-32 px-6 flex flex-col items-center min-h-[95vh] cursor-none group bg-white overflow-hidden">
+
+          {/* Activation Circle */}
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            onMouseEnter={() => setIsRevealMode(true)}
+            className="absolute left-10 top-32 w-20 h-20 bg-black rounded-full z-50 flex items-center justify-center shadow-2xl transition-all hover:scale-110 active:scale-90 border border-black/10 group/trigger"
+          >
+            <Zap className="text-white w-8 h-8 group-hover/trigger:scale-125 transition-transform" />
+            <div className="absolute top-FULL pt-2 opacity-0 group-hover/trigger:opacity-100 transition-opacity whitespace-nowrap text-[8px] font-black uppercase tracking-[0.3em]">
+              Trigger Reveal
+            </div>
+          </motion.div>
+
+          {/* 1. Base Layer (Bottom Text) */}
           <motion.div
             style={{ y: heroY, opacity: heroOpacity }}
-            className="max-w-4xl mx-auto flex flex-col items-center text-center relative z-20"
+            className="max-w-4xl mx-auto flex flex-col items-center text-center relative z-10 pointer-events-none"
           >
-            <h1 className="text-2xl sm:text-4xl md:text-[4rem] font-[800] tracking-[-0.03em] mb-8 leading-[1.05] text-black">
+            <h1 className="text-2xl sm:text-4xl md:text-[3rem] font-[800] tracking-[-0.03em] mb-8 leading-[1.05] text-black">
               Discover, plan, scale. <br />
               With Influence at your side.
             </h1>
-
             <p className="text-base sm:text-lg text-black/60 font-medium mb-10 max-w-2xl px-4 leading-relaxed">
               Collabify is the connected workspace where high-growth brands <br className="hidden md:block" /> and creators build culture together.
             </p>
-
-            <Link href="/signup" className="h-10 px-8 bg-black text-white text-sm font-bold rounded-full flex items-center gap-2 hover:scale-105 transition-transform shadow-xl">
+            <Link href="/signup" className="pointer-events-auto h-12 px-10 bg-black text-white text-sm font-bold rounded-full flex items-center gap-2 hover:scale-105 transition-transform shadow-xl">
               Get Collabify free <ArrowRight size={16} />
             </Link>
           </motion.div>
 
-          {/* Videos - Sharp & Clear (mix-blend-multiply at 100% opacity, No White box) */}
-          <div className="absolute inset-0 pointer-events-none z-10 hidden sm:block">
-            {/* Left analyticman video */}
+          {/* 2. Stronger Liquid Reveal Layer */}
+          <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden">
+            <svg width="100%" height="100%" className="absolute inset-0">
+              <mask id="fluidMask">
+                <g className="heavy-fluid">
+                  <AnimatePresence>
+                    {drops.map((drop) => (
+                      <motion.circle
+                        key={drop.id}
+                        initial={{ r: 0, opacity: 0 }}
+                        animate={{ r: 120, opacity: 1 }}
+                        exit={{ r: 0, opacity: 0, transition: { duration: 1.2, ease: "circIn" } }}
+                        cx={drop.x}
+                        cy={drop.y}
+                        fill="white"
+                      />
+                    ))}
+                  </AnimatePresence>
+                </g>
+              </mask>
+            </svg>
+
             <motion.div
               style={{
-                x: useTransform(springX, [0, 2000], [-30, 30]),
-                y: useTransform(springY, [0, 1000], [-15, 15]),
+                y: heroY,
+                opacity: heroOpacity,
+                maskImage: 'url(#fluidMask)',
+                WebkitMaskImage: 'url(#fluidMask)'
               }}
-              className="absolute left-0 bottom-[10%] w-[35%] max-w-[550px]"
+              className="absolute inset-0 bg-black text-white pt-64 flex flex-col items-center text-center translate-z-0"
             >
+              <div className="max-w-4xl mx-auto flex flex-col items-center">
+                <h1 className="text-2xl sm:text-4xl md:text-[3rem] font-[800] tracking-[-0.03em] mb-8 leading-[1.05] text-white">
+                  Create, lead, win. <br />
+                  The future is yours.
+                </h1>
+                <p className="text-base sm:text-lg text-white/60 font-medium mb-10 max-w-2xl px-4 leading-relaxed">
+                  Unlock exclusive tools and viral strategies <br className="hidden md:block" /> built for the next generation of brands.
+                </p>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* 3. Character Videos (Fixed Background) */}
+          <div className="absolute inset-0 pointer-events-none z-0 hidden sm:block">
+            <div className="absolute left-0 bottom-[5%] w-[38%] max-w-[550px]">
               <video
                 autoPlay loop muted playsInline
-                className="w-full h-auto mix-blend-multiply grayscale contrast-[1.6]"
+                className="w-full h-auto mix-blend-multiply grayscale opacity-100 contrast-[5] brightness-[1.1]"
               >
                 <source src="/analyticman.mp4" type="video/mp4" />
               </video>
-            </motion.div>
+            </div>
 
-            {/* Right selfiewomen video */}
-            <motion.div
-              style={{
-                x: useTransform(springX, [0, 2000], [30, -30]),
-                y: useTransform(springY, [0, 1000], [15, -15]),
-              }}
-              className="absolute right-0 bottom-[-5%] w-[33%] max-w-[550px]"
-            >
+            <div className="absolute right-0 bottom-[-5%] w-[35%] max-w-[550px]">
               <video
                 autoPlay loop muted playsInline
-                className="w-full h-auto mix-blend-multiply contrast-[1.6]"
+                className="w-full h-auto mix-blend-multiply opacity-100 contrast-[5] brightness-[1.1]"
               >
                 <source src="/selfiewomen.mp4" type="video/mp4" />
               </video>
-            </motion.div>
+            </div>
           </div>
         </section>
 
-        {/* Feature Section - Exact Reference Match */}
-        <section className="py-48 bg-white flex flex-col items-center">
+        {/* Feature Grid */}
+        <section className="py-48 bg-white flex flex-col items-center border-t border-black/5">
           <div className="mb-6">
             <div className="px-6 py-2 bg-black text-white text-[10px] font-black uppercase tracking-[0.4em] rounded-full">
               The Toolkit
@@ -173,7 +246,6 @@ export default function Home() {
             Tools that move <br />
             as fast as you do.
           </h2>
-
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, i) => (
               <motion.div
@@ -199,7 +271,7 @@ export default function Home() {
         </section>
       </main>
 
-      {/* Simplified Footer */}
+      {/* Footer */}
       <footer className="bg-white py-24 px-6 sm:px-12 border-t border-black/[0.03]">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 text-[10px] font-bold uppercase tracking-[0.3em] text-black/20">
           <div className="flex items-center gap-3">

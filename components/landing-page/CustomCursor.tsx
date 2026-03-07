@@ -1,43 +1,51 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, useSpring } from "framer-motion";
+import { motion, useSpring, useMotionValue } from "framer-motion";
 
 export const CustomCursor = () => {
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
 
-    const springConfig = { damping: 30, stiffness: 200, restDelta: 0.001 };
-    const cursorX = useSpring(0, springConfig);
-    const cursorY = useSpring(0, springConfig);
+    const mainSpringConfig = { damping: 30, stiffness: 300, restDelta: 0.001 };
+    const outerSpringConfig = { damping: 40, stiffness: 250, restDelta: 0.001 };
+
+    const springX = useSpring(mouseX, mainSpringConfig);
+    const springY = useSpring(mouseY, mainSpringConfig);
+
+    const outerX = useSpring(mouseX, outerSpringConfig);
+    const outerY = useSpring(mouseY, outerSpringConfig);
 
     useEffect(() => {
         const mouseMove = (e: MouseEvent) => {
-            cursorX.set(e.clientX);
-            cursorY.set(e.clientY);
-            setMousePosition({ x: e.clientX, y: e.clientY });
+            mouseX.set(e.clientX);
+            mouseY.set(e.clientY);
         };
 
         window.addEventListener("mousemove", mouseMove);
-
         return () => {
             window.removeEventListener("mousemove", mouseMove);
         };
-    }, [cursorX, cursorY]);
+    }, [mouseX, mouseY]);
 
     return (
         <>
+            {/* Outer Concentric Circle (Fluid Trailing Ring) */}
             <motion.div
-                className="cursor-glow fixed top-0 left-0 hidden md:block"
+                className="fixed top-0 left-0 w-12 h-12 border border-black/10 rounded-full pointer-events-none z-[10000] hidden md:block"
                 style={{
-                    x: cursorX,
-                    y: cursorY,
+                    x: outerX,
+                    y: outerY,
+                    translateX: "-50%",
+                    translateY: "-50%",
                 }}
             />
+            {/* Inner Precision Dot */}
             <motion.div
-                className="fixed top-0 left-0 w-4 h-4 bg-black rounded-full pointer-events-none z-[10000] mix-blend-difference hidden md:block"
+                className="fixed top-0 left-0 w-2 h-2 bg-white rounded-full pointer-events-none z-[10000] border border-black/10 shadow-sm hidden md:block"
                 style={{
-                    x: cursorX,
-                    y: cursorY,
+                    x: springX,
+                    y: springY,
                     translateX: "-50%",
                     translateY: "-50%",
                 }}
