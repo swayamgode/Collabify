@@ -133,17 +133,17 @@ export default function Home() {
         <div className="w-64 hidden lg:block" />
 
         {/* Centered Navigation Pill */}
-        <nav className={`flex items-center gap-6 px-6 py-2 ${scrolled ? "bg-white/90 backdrop-blur-xl shadow-lg border border-black/5" : "bg-white/50 backdrop-blur-md border border-black/5"} rounded-full transition-all duration-300`}>
-          <Link href="/" className="px-6 py-2 bg-black text-white text-sm font-bold rounded-full">Home</Link>
-          <Link href="#" className="text-sm font-bold text-black/60 hover:text-black transition-colors">Contact</Link>
-          <Link href="#" className="text-sm font-bold text-black/60 hover:text-black transition-colors">Influencers</Link>
-          <Link href="#" className="text-sm font-bold text-black/60 hover:text-black transition-colors">About</Link>
+        <nav className={`flex items-center gap-6 px-6 py-2 ${isRevealMode ? "bg-white/10 backdrop-blur-xl border-white/10" : scrolled ? "bg-white/90 backdrop-blur-xl shadow-lg border border-black/5" : "bg-white/50 backdrop-blur-md border border-black/5"} rounded-full transition-all duration-300`}>
+          <Link href="/" className={`${isRevealMode ? "bg-white text-black" : "bg-black text-white"} px-6 py-2 text-sm font-bold rounded-full transition-colors`}>Home</Link>
+          <Link href="#" className={`text-sm font-bold ${isRevealMode ? "text-white/60 hover:text-white" : "text-black/60 hover:text-black"} transition-colors`}>Contact</Link>
+          <Link href="#" className={`text-sm font-bold ${isRevealMode ? "text-white/60 hover:text-white" : "text-black/60 hover:text-black"} transition-colors`}>Influencers</Link>
+          <Link href="#" className={`text-sm font-bold ${isRevealMode ? "text-white/60 hover:text-white" : "text-black/60 hover:text-black"} transition-colors`}>About</Link>
         </nav>
 
         {/* Right Aligned Auth Links */}
         <div className="flex items-center gap-6 min-w-[250px] justify-end">
-          <Link href="/login" className="text-sm font-bold text-black hover:text-black/60 transition-colors">Login</Link>
-          <Link href="/signup" className="px-6 py-2 bg-black text-white text-sm font-bold rounded-full transition-transform hover:scale-105 shadow-lg shadow-black/10">Get Started</Link>
+          <Link href="/login" className={`text-sm font-bold ${isRevealMode ? "text-white hover:text-white/60" : "text-black hover:text-black/60"} transition-colors`}>Login</Link>
+          <Link href="/signup" className={`${isRevealMode ? "bg-white text-black" : "bg-black text-white"} px-6 py-2 text-sm font-bold rounded-full transition-transform hover:scale-105 shadow-lg ${isRevealMode ? "shadow-white/5" : "shadow-black/10"}`}>Get Started</Link>
         </div>
       </header>
 
@@ -308,7 +308,7 @@ export default function Home() {
 
           {/* 3. Character Videos (Fixed Background) */}
           <div className="absolute inset-0 pointer-events-none z-0 hidden sm:block">
-            <div className="absolute left-0 bottom-[0%] w-[38%] max-w-[550px]">
+            <div className="absolute left-0 bottom-[-6%] w-[38%] max-w-[550px]">
               <video
                 autoPlay loop muted playsInline
                 className="w-full h-auto mix-blend-multiply grayscale opacity-100 contrast-[5] brightness-[1.1]"
@@ -317,7 +317,7 @@ export default function Home() {
               </video>
             </div>
 
-            <div className="absolute right-0 bottom-[-12%] w-[35%] max-w-[550px]">
+            <div className="absolute right-0 bottom-[-18%] w-[35%] max-w-[550px]">
               <video
                 autoPlay loop muted playsInline
                 className="w-full h-auto mix-blend-multiply opacity-100 contrast-[5] brightness-[1.1]"
