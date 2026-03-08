@@ -1,3 +1,5 @@
+'use server'
+
 import { cookies } from 'next/headers'
 import { ConvexHttpClient } from "convex/browser"
 import { api } from "@/convex/_generated/api"

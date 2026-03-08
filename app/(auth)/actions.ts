@@ -5,83 +5,98 @@ import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { ConvexHttpClient } from "convex/browser"
 import { api } from "@/convex/_generated/api"
+import * as crypto from 'crypto'
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+
+// Helper to hash password
+const hashPassword = (password: string) => {
+    return crypto.createHash('sha256').update(password).digest('hex');
+};
 
 export async function login(formData: FormData) {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
-    // For demo: verify against Convex profiles
-    // In a real app, you'd use a real auth provider like Clerk + Convex
-    const profile = await convex.query(api.profiles.getProfile, { userId: email });
+    // Check against real users table
+    const user = await convex.query(api.users.getUserByEmail, { email });
 
-    if (!profile) {
-        // Fallback or auto-signup for demo
-        const isInfluencer = email.includes('influencer');
-        const role = isInfluencer ? 'influencer' : 'brand';
-
-        const profileId = await convex.mutation(api.profiles.createProfile, {
-            userId: email,
-            fullName: email.split('@')[0],
-            role,
+    // Strictly check: User must exist, and password must match
+    if (!user || user.password !== hashPassword(password)) {
+        // Redirect back with error for specific login failure
+        const searchParams = new URLSearchParams({
+            error: "Invalid email or password. Please try again."
         });
-
-        if (role === 'brand') {
-            await convex.mutation(api.brands.createBrand, {
-                profileId,
-                companyName: `${email.split('@')[0]}'s Brand`,
-            });
-        }
-
-        // Mock Session
-        const cookieStore = await cookies();
-        cookieStore.set('mock_user_id', email, { path: '/' });
-
-        revalidatePath('/', 'layout');
-        redirect(isInfluencer ? '/influencer' : '/brand');
-        return;
+        redirect(`/login?${searchParams.toString()}`);
     }
 
-    // Mock Session
+    // Now get the specific profile associated with this user
+    const profile = await convex.query(api.profiles.getProfile, { userId: user._id });
+
+    if (!profile) {
+        // This shouldn't happen if signup works correctly, but good to check
+        redirect('/login?error=Profile missing. Contact support.');
+    }
+
+    // Set genuine session
     const cookieStore = await cookies();
-    cookieStore.set('mock_user_id', email, { path: '/' });
+    cookieStore.set('mock_user_id', user._id, {
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7 // 7 days
+    });
 
     revalidatePath('/', 'layout');
 
-    // Redirect based on role in Convex
-    if (profile.role === 'influencer') {
-        redirect('/influencer');
-    } else {
-        redirect('/brand');
-    }
+    // Proceed to dashboard
+    redirect(profile.role === 'influencer' ? '/influencer' : '/brand');
 }
 
 export async function signup(formData: FormData) {
     const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
     const fullName = formData.get('fullName') as string;
     const role = formData.get('role') as 'brand' | 'influencer';
 
-    // Create profile in Convex
-    const profileId = await convex.mutation(api.profiles.createProfile, {
-        userId: email,
-        fullName,
-        role,
-    });
-
-    if (role === 'brand') {
-        await convex.mutation(api.brands.createBrand, {
-            profileId,
-            companyName: `${fullName}'s Brand`,
+    try {
+        // 1. Create the secure user credential record
+        const userId = await convex.mutation(api.users.createUser, {
+            email,
+            password: hashPassword(password),
+            role,
         });
+
+        // 2. Create the associated profile
+        const profileId = await convex.mutation(api.profiles.createProfile, {
+            userId,
+            fullName,
+            role,
+        });
+
+        // 3. Optional: Create role-specific table entry
+        if (role === 'brand') {
+            await convex.mutation(api.brands.createBrand, {
+                profileId,
+                companyName: `${fullName}'s Brand`,
+            });
+        }
+
+        // 4. Log them in immediately
+        const cookieStore = await cookies();
+        cookieStore.set('mock_user_id', userId, { path: '/' });
+
+        revalidatePath('/', 'layout');
+        return redirect(role === 'brand' ? '/brand' : '/influencer');
+    } catch (error: any) {
+        console.error("Signup error:", error);
+        // Error could be "User already exists" from our mutation
+        const searchParams = new URLSearchParams({
+            error: error.message || "Failed to create account. Please try again."
+        });
+        return redirect(`/signup?${searchParams.toString()}`);
     }
-
-    // Mock Session
-    const cookieStore = await cookies();
-    cookieStore.set('mock_user_id', email, { path: '/' });
-
-    revalidatePath('/', 'layout')
-    return redirect(role === 'brand' ? '/brand' : '/influencer')
 }
 
 export async function logout() {
