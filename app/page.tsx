@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowRight, ChevronRight, Sparkles, Layout, MessageSquare, Briefcase, Zap, Star } from "lucide-react";
 import { motion } from "framer-motion";
+import Scene from "@/components/Scene";
 
 export default function Home() {
   const products = [
@@ -34,7 +35,8 @@ export default function Home() {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-white text-black selection:bg-black selection:text-white font-sans antialiased">
+    <div className="flex flex-col min-h-screen bg-transparent text-black selection:bg-black selection:text-white font-sans antialiased relative">
+      <Scene />
 
       {/* Navigation */}
       <header className="sticky top-0 z-50 py-4 px-6 sm:px-12 bg-white/80 backdrop-blur-md flex justify-between items-center border-b border-gray-100">
@@ -62,10 +64,10 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section className="pt-20 pb-12 px-6 overflow-hidden">
-          <div className="max-w-4xl mx-auto flex flex-col items-center text-center">
+      <main className="flex-1 w-full relative z-10">
+        {/* Layer 1: Hero Section */}
+        <section className="min-h-screen pt-20 pb-12 px-6 overflow-hidden flex flex-col justify-center bg-transparent pointer-events-none">
+          <div className="max-w-4xl mx-auto flex flex-col items-center text-center pointer-events-auto">
             <motion.h1
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -97,111 +99,26 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Illustration Section */}
-        <section className="max-w-6xl mx-auto px-6 pb-32 pt-12">
+        {/* Layer 2: Illustration Section */}
+        <section className="min-h-screen max-w-6xl mx-auto px-6 py-20 bg-transparent flex flex-col justify-center pointer-events-none">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 1 }}
-            className="w-full relative flex flex-col items-center"
+            className="w-full relative flex flex-col items-center pointer-events-auto mt-20"
           >
-            {/* The "Scene" */}
-            <div className="relative w-full flex items-end justify-center min-h-[400px] mb-12">
-
-              {/* Ground Line - Hand Drawn Style */}
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[90%] h-[1px] bg-black/10" />
-
-              {/* Left Character (The Creator) */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5, duration: 0.8 }}
-                className="relative mb-0 flex flex-col items-center z-0"
-              >
-                {/* Floating Annotation: Message Bubble */}
-                <motion.div
-                  animate={{ y: [0, -5, 0] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                  className="absolute -top-12 -left-8 px-3 py-1 bg-white border-2 border-black rounded-2xl text-[10px] font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center gap-1 z-20"
-                >
-                  <MessageSquare size={10} fill="black" /> Hello!
-                </motion.div>
-
-                <img
-                  src="/Gemini_Generated_Image_8kczx78kczx78kcz.png"
-                  alt="Creative Influencer"
-                  className="w-48 sm:w-64 h-auto mix-blend-multiply opacity-90 hover:opacity-100 transition-opacity grayscale hover:grayscale-0"
-                />
-              </motion.div>
-
-              {/* Center Character (The Platform) */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.8 }}
-                className="relative z-10 -mx-12 -mb-2 flex flex-col items-center"
-              >
-                {/* Floating Annotation: Platform Badge */}
-                <motion.div
-                  animate={{ rotate: [12, -12, 12] }}
-                  transition={{ duration: 6, repeat: Infinity }}
-                  className="absolute -top-4 -right-2 w-10 h-10 bg-black rounded-lg flex items-center justify-center text-white z-20 shadow-lg"
-                >
-                  <span className="text-xs font-black">C.</span>
-                </motion.div>
-
-                <div className="relative">
-                  <img
-                    src="/Gemini_Generated_Image_251jse251jse251j.png"
-                    alt="Collabify Core"
-                    className="w-56 sm:w-80 h-auto mix-blend-multiply transition-transform hover:scale-105 duration-500"
-                  />
-                  {/* Highlight Glow behind center char */}
-                  <div className="absolute inset-0 bg-blue-400/5 blur-3xl -z-10 rounded-full scale-75" />
-                </div>
-              </motion.div>
-
-              {/* Right Character (The Brand) */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.6, duration: 0.8 }}
-                className="relative mb-0 flex flex-col items-center z-0"
-              >
-                {/* Floating Annotation: Analytics Card */}
-                <motion.div
-                  animate={{ y: [0, 5, 0] }}
-                  transition={{ duration: 4, repeat: Infinity }}
-                  className="absolute -top-8 -right-8 p-2 bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] flex flex-col gap-1 z-20"
-                >
-                  <div className="w-8 h-1.5 bg-black rounded-full" />
-                  <div className="flex gap-0.5 items-end h-6">
-                    {[3, 6, 4, 8, 5].map((h, i) => (
-                      <div key={i} className="w-1 bg-black rounded-t-full" style={{ height: `${h * 4}px` }} />
-                    ))}
-                  </div>
-                </motion.div>
-
-                <img
-                  src="/Gemini_Generated_Image_adans2adans2adan.png"
-                  alt="Brand Representative"
-                  className="w-48 sm:w-64 h-auto mix-blend-multiply opacity-90 hover:opacity-100 transition-opacity grayscale hover:grayscale-0"
-                />
-              </motion.div>
-            </div>
-
-            {/* Subtext under illustration */}
-            <div className="flex items-center gap-12 text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em]">
+            {/* Subtext overlay for 3D Scene */}
+            <div className="flex items-center gap-6 sm:gap-12 text-[14px] font-black text-gray-800 uppercase tracking-[0.2em] bg-white/40 backdrop-blur-md px-8 py-4 rounded-full shadow-sm">
               <span>Visionary Brands</span>
-              <div className="w-12 h-[1px] bg-gray-200" />
+              <div className="w-12 h-[2px] bg-black" />
               <span>Cultural Creators</span>
             </div>
           </motion.div>
         </section>
 
-        {/* Product Grid */}
-        <section className="max-w-6xl mx-auto px-6 pb-40">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Layer 3: Product Grid */}
+        <section className="min-h-screen w-full mx-auto px-6 py-32 bg-transparent pointer-events-none flex flex-col justify-center">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pointer-events-auto">
             {products.map((product, i) => (
               <motion.div
                 key={i}
