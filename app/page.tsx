@@ -74,19 +74,23 @@ export default function Home() {
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (isRevealMode) {
+      if (isRevealMode && heroRef.current) {
+        const rect = heroRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
         const newDrop = {
           id: dropIdCounter.current++,
-          x: e.clientX,
-          y: e.clientY
+          x,
+          y
         };
 
         setDrops(prev => [...prev, newDrop]);
 
-        // Remove drop after 12 seconds (Increased Persistence)
+        // Remove drop after 15 seconds (Persistence)
         setTimeout(() => {
           setDrops(prev => prev.filter(d => d.id !== newDrop.id));
-        }, 12000);
+        }, 15000);
       }
     };
 
@@ -170,9 +174,9 @@ export default function Home() {
               }
             }}
             onMouseEnter={() => setIsRevealMode(true)}
-            className="absolute left-0 top-0 w-56 h-56 bg-black z-[60] flex items-center justify-center transition-all active:scale-95 group/trigger overflow-hidden cursor-pointer pointer-events-auto"
+            className="absolute left-0 top-0 w-72 h-72 bg-black z-[60] flex items-center justify-center transition-all active:scale-95 group/trigger overflow-hidden cursor-pointer pointer-events-auto"
           >
-            <div className="absolute left-6 top-6 w-16 h-16 flex items-center justify-center">
+            <div className="absolute left-8 top-8 w-24 h-24 flex items-center justify-center">
               <img
                 src="/logocollabify.png"
                 alt="Collabify Logo"
@@ -208,8 +212,8 @@ export default function Home() {
                       <motion.circle
                         key={drop.id}
                         initial={{ r: 0, opacity: 0 }}
-                        animate={{ r: 120, opacity: 1 }}
-                        exit={{ r: 0, opacity: 0, transition: { duration: 1.2, ease: "circIn" } }}
+                        animate={{ r: 180, opacity: 1 }}
+                        exit={{ r: 0, opacity: 0, transition: { duration: 0.5, ease: "circIn" } }}
                         cx={drop.x}
                         cy={drop.y}
                         fill="white"
@@ -277,7 +281,7 @@ export default function Home() {
 
               {/* Reveal Phase Characters */}
               <div className="absolute inset-x-0 bottom-[-100px] top-0 pointer-events-none z-0 hidden sm:block">
-                <div className="absolute left-[-2%] bottom-[15%] w-[48%] max-w-[650px]">
+                <div className="absolute left-[-6%] bottom-[22%] w-[48%] max-w-[650px]">
                   <video
                     autoPlay loop muted playsInline
                     className="w-full h-auto opacity-100 contrast-[5] brightness-[1.5] grayscale"
