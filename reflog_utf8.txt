@@ -1,0 +1,7 @@
+﻿f5fa303 HEAD@{0}: reset: moving to f5fa303
+f250da5 HEAD@{1}: reset: moving to HEAD
+f250da5 HEAD@{2}: commit: Added character
+07985fa HEAD@{3}: commit: First acha khasa
+08e1028 HEAD@{4}: checkout: moving from main to Bhavik
+08e1028 HEAD@{5}: pull origin vedant: Fast-forward
+33341db HEAD@{6}: clone: from https://github.com/swayamgode/Collabify.git
