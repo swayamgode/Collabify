@@ -170,9 +170,9 @@ export default function Home() {
               }
             }}
             onMouseEnter={() => setIsRevealMode(true)}
-            className="absolute left-0 top-0 w-80 h-80 bg-black z-[60] flex items-center justify-center transition-all active:scale-95 group/trigger overflow-hidden cursor-pointer pointer-events-auto"
+            className="absolute left-0 top-0 w-56 h-56 bg-black z-[60] flex items-center justify-center transition-all active:scale-95 group/trigger overflow-hidden cursor-pointer pointer-events-auto"
           >
-            <div className="absolute left-10 top-10 w-32 h-32 flex items-center justify-center">
+            <div className="absolute left-6 top-6 w-16 h-16 flex items-center justify-center">
               <img
                 src="/logocollabify.png"
                 alt="Collabify Logo"
@@ -229,7 +229,40 @@ export default function Home() {
               }}
               className="absolute top-0 left-0 right-0 bottom-[-100px] bg-black text-white pt-40 flex flex-col items-center text-center translate-z-0"
             >
-              <div className="max-w-4xl mx-auto flex flex-col items-center">
+              {/* Subtle Stars Background */}
+              <div className="absolute inset-0 z-0 pointer-events-none opacity-60">
+                {/* Cluster 1 */}
+                <div className="absolute top-[15%] left-[10%] w-[1.5px] h-[1.5px] bg-white rounded-full blur-[0.2px] animate-pulse" />
+                <div className="absolute top-[25%] left-[80%] w-[1px] h-[1px] bg-white rounded-full" />
+                <div className="absolute top-[40%] left-[15%] w-[1.8px] h-[1.8px] bg-white rounded-full blur-[0.4px]" />
+                <div className="absolute top-[60%] left-[85%] w-[1.2px] h-[1.2px] bg-white rounded-full animate-pulse" />
+                <div className="absolute top-[75%] left-[25%] w-[1px] h-[1px] bg-white rounded-full" />
+                <div className="absolute top-[10%] left-[60%] w-[1.5px] h-[1.5px] bg-white rounded-full blur-[0.2px]" />
+
+                {/* Cluster 2 */}
+                <div className="absolute top-[85%] left-[55%] w-[1.8px] h-[1.8px] bg-white rounded-full blur-[0.4px] animate-pulse" style={{ animationDelay: '1s' }} />
+                <div className="absolute top-[35%] left-[92%] w-[1px] h-[1px] bg-white rounded-full" />
+                <div className="absolute top-[50%] left-[38%] w-[1.4px] h-[1.4px] bg-white rounded-full" />
+                <div className="absolute top-[92%] left-[70%] w-[1.2px] h-[1.2px] bg-white rounded-full blur-[0.2px]" />
+                <div className="absolute top-[20%] left-[45%] w-[1px] h-[1px] bg-white rounded-full opacity-50" />
+                <div className="absolute top-[65%] left-[12%] w-[1px] h-[1px] bg-white rounded-full opacity-50" />
+
+                {/* Cluster 3 (New) */}
+                <div className="absolute top-[5%] left-[25%] w-[1px] h-[1px] bg-white rounded-full" />
+                <div className="absolute top-[18%] left-[72%] w-[1.3px] h-[1.3px] bg-white rounded-full blur-[0.1px]" />
+                <div className="absolute top-[32%] left-[3%] w-[1.5px] h-[1.5px] bg-white rounded-full blur-[0.3px] animate-pulse" style={{ animationDelay: '2s' }} />
+                <div className="absolute top-[48%] left-[65%] w-[1px] h-[1px] bg-white rounded-full" />
+                <div className="absolute top-[72%] left-[95%] w-[1.8px] h-[1.8px] bg-white rounded-full blur-[0.5px]" />
+                <div className="absolute top-[88%] left-[18%] w-[1.1px] h-[1.1px] bg-white rounded-full" />
+                <div className="absolute top-[55%] left-[42%] w-[1.4px] h-[1.4px] bg-white rounded-full blur-[0.2px] animate-pulse" style={{ animationDelay: '0.5s' }} />
+                <div className="absolute top-[12%] left-[88%] w-[1px] h-[1px] bg-white rounded-full" />
+                <div className="absolute top-[78%] left-[48%] w-[1.5px] h-[1.5px] bg-white rounded-full opacity-40" />
+                <div className="absolute top-[45%] left-[22%] w-[1.2px] h-[1.2px] bg-white rounded-full blur-[0.1px]" />
+                <div className="absolute top-[95%] left-[5%] w-[1.3px] h-[1.3px] bg-white rounded-full" />
+                <div className="absolute top-[28%] left-[58%] w-[1px] h-[1px] bg-white rounded-full" />
+              </div>
+
+              <div className="max-w-4xl mx-auto flex flex-col items-center relative z-10">
                 <h1 className="text-2xl sm:text-4xl md:text-[2.75rem] font-[800] tracking-[-0.03em] mb-8 leading-[1.05] text-white">
                   Create, lead, win. <br />
                   The future is yours.
@@ -237,6 +270,27 @@ export default function Home() {
                 <p className="text-base sm:text-lg text-white/60 font-medium mb-10 max-w-2xl px-4 leading-relaxed">
                   Unlock exclusive tools and viral strategies <br className="hidden md:block" /> built for the next generation of brands.
                 </p>
+              </div>
+
+              {/* Reveal Phase Characters */}
+              <div className="absolute inset-x-0 bottom-[-100px] top-0 pointer-events-none z-0 hidden sm:block">
+                <div className="absolute left-0 bottom-[25%] w-[38%] max-w-[550px]">
+                  <video
+                    autoPlay loop muted playsInline
+                    className="w-full h-auto opacity-100 contrast-[5] brightness-[1.5] grayscale"
+                  >
+                    <source src="/floating man.mp4" type="video/mp4" />
+                  </video>
+                </div>
+                {/* Keep woman on the right but without inversion for black bg */}
+                <div className="absolute right-0 bottom-[15%] w-[35%] max-w-[550px]">
+                  <video
+                    autoPlay loop muted playsInline
+                    className="w-full h-auto opacity-100 contrast-[5] brightness-[1.5]"
+                  >
+                    <source src="/selfiewomen.mp4" type="video/mp4" />
+                  </video>
+                </div>
               </div>
             </motion.div>
           </div>
