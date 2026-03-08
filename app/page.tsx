@@ -83,10 +83,10 @@ export default function Home() {
 
         setDrops(prev => [...prev, newDrop]);
 
-        // Remove drop after 6 seconds (Persistence)
+        // Remove drop after 12 seconds (Increased Persistence)
         setTimeout(() => {
           setDrops(prev => prev.filter(d => d.id !== newDrop.id));
-        }, 6000);
+        }, 12000);
       }
     };
 
@@ -270,11 +270,14 @@ export default function Home() {
                 <p className="text-base sm:text-lg text-white/60 font-medium mb-10 max-w-2xl px-4 leading-relaxed">
                   Unlock exclusive tools and viral strategies <br className="hidden md:block" /> built for the next generation of brands.
                 </p>
+                <Link href="/signup" className="pointer-events-auto h-12 px-10 bg-white text-black text-sm font-bold rounded-full flex items-center gap-2 hover:scale-105 transition-transform shadow-xl">
+                  Get Collabify free <ArrowRight size={16} />
+                </Link>
               </div>
 
               {/* Reveal Phase Characters */}
               <div className="absolute inset-x-0 bottom-[-100px] top-0 pointer-events-none z-0 hidden sm:block">
-                <div className="absolute left-0 bottom-[25%] w-[38%] max-w-[550px]">
+                <div className="absolute left-[-2%] bottom-[15%] w-[48%] max-w-[650px]">
                   <video
                     autoPlay loop muted playsInline
                     className="w-full h-auto opacity-100 contrast-[5] brightness-[1.5] grayscale"
@@ -282,13 +285,13 @@ export default function Home() {
                     <source src="/floating man.mp4" type="video/mp4" />
                   </video>
                 </div>
-                {/* Keep woman on the right but without inversion for black bg */}
-                <div className="absolute right-0 bottom-[15%] w-[35%] max-w-[550px]">
+                {/* Floating Woman on the right - Scaled Down */}
+                <div className="absolute right-[2%] bottom-[8%] w-[30%] max-w-[450px]">
                   <video
                     autoPlay loop muted playsInline
                     className="w-full h-auto opacity-100 contrast-[5] brightness-[1.5]"
                   >
-                    <source src="/selfiewomen.mp4" type="video/mp4" />
+                    <source src="/womenfloating.mp4" type="video/mp4" />
                   </video>
                 </div>
               </div>
