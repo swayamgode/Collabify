@@ -148,6 +148,7 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
+        {/* Hero Section */}
         <section ref={heroRef} className="relative pt-40 pb-32 px-6 flex flex-col items-center min-h-[95vh] cursor-none group bg-white">
 
           {/* Collabify Amoeba Logo Trigger */}
@@ -187,7 +188,7 @@ export default function Home() {
 
           {/* 1. Base Layer (Bottom Text) */}
           <motion.div
-            style={{ y: heroY, opacity: heroOpacity }}
+            style={{ y: heroY }}
             className="max-w-4xl mx-auto flex flex-col items-center text-center relative z-10 pointer-events-none"
           >
             <h1 className="text-2xl sm:text-4xl md:text-[2.75rem] font-[800] tracking-[-0.03em] mb-8 leading-[1.05] text-black">
@@ -221,13 +222,16 @@ export default function Home() {
                     ))}
                   </AnimatePresence>
                 </g>
+                {/* Organic Black Drips - Fixed to the bottom of the reveal layer */}
+                <path
+                  fill="white"
+                  d="M0,850 Q100,850 150,950 Q200,850 300,850 Q400,850 450,1050 Q500,850 650,850 Q800,850 850,980 Q900,850 1100,850 Q1250,850 1300,1020 Q1350,850 1440,850 L1440,3000 L0,3000 Z"
+                />
               </mask>
             </svg>
-
             <motion.div
               style={{
                 y: heroY,
-                opacity: heroOpacity,
                 maskImage: 'url(#fluidMask)',
                 WebkitMaskImage: 'url(#fluidMask)'
               }}
@@ -304,7 +308,7 @@ export default function Home() {
 
           {/* 3. Character Videos (Fixed Background) */}
           <div className="absolute inset-0 pointer-events-none z-0 hidden sm:block">
-            <div className="absolute left-0 bottom-[5%] w-[38%] max-w-[550px]">
+            <div className="absolute left-0 bottom-[0%] w-[38%] max-w-[550px]">
               <video
                 autoPlay loop muted playsInline
                 className="w-full h-auto mix-blend-multiply grayscale opacity-100 contrast-[5] brightness-[1.1]"
@@ -313,7 +317,7 @@ export default function Home() {
               </video>
             </div>
 
-            <div className="absolute right-0 bottom-[-5%] w-[35%] max-w-[550px]">
+            <div className="absolute right-0 bottom-[-12%] w-[35%] max-w-[550px]">
               <video
                 autoPlay loop muted playsInline
                 className="w-full h-auto mix-blend-multiply opacity-100 contrast-[5] brightness-[1.1]"
@@ -324,38 +328,66 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Feature Grid */}
-        <section className="py-48 bg-white flex flex-col items-center">
-          <div className="mb-6">
-            <div className="px-6 py-2 bg-black text-white text-[10px] font-black uppercase tracking-[0.4em] rounded-full">
-              The Toolkit
+        {/* Feature Grid - Clean Overlap transition */}
+        <section className="relative bg-white flex flex-col items-center">
+          <div className="py-48 flex flex-col items-center w-full relative z-10 bg-white">
+            <div className="mb-6">
+              <div className="px-6 py-2 bg-black text-white text-[10px] font-black uppercase tracking-[0.4em] rounded-full">
+                The Toolkit
+              </div>
             </div>
-          </div>
-          <h2 className="text-4xl sm:text-6xl font-bold tracking-tight text-center mb-36 font-serif">
-            Tools that move <br />
-            as fast as you do.
-          </h2>
-          <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="bg-gray-50/50 border border-gray-100 p-10 rounded-[3rem] flex flex-col hover:bg-white hover:shadow-2xl transition-all duration-700 group cursor-default"
-              >
-                <div className={`w-12 h-12 rounded-2xl ${feature.highlight} flex items-center justify-center mb-10 border border-black/5 shadow-sm group-hover:scale-110 transition-transform`}>
-                  {feature.icon}
-                </div>
-                <h3 className="text-2xl font-black tracking-tight mb-5">{feature.title}</h3>
-                <p className="text-black/40 font-bold text-sm leading-relaxed mb-10">
-                  {feature.desc}
-                </p>
-                <Link href="#" className="mt-auto text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-3 text-black group-hover:gap-6 transition-all duration-500">
-                  LEARN MORE <ChevronRight size={12} />
-                </Link>
-              </motion.div>
-            ))}
+            <h2 className="text-4xl sm:text-6xl font-bold tracking-tight text-center mb-36 font-serif">
+              Tools that move <br />
+              as fast as you do.
+            </h2>
+            <motion.div
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={{
+                hidden: { opacity: 0 },
+                show: {
+                  opacity: 1,
+                  transition: {
+                    staggerChildren: 0.15,
+                    delayChildren: 0.2
+                  }
+                }
+              }}
+              className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+            >
+              {features.map((feature, i) => (
+                <motion.div
+                  key={i}
+                  variants={{
+                    hidden: { opacity: 0, y: 50, scale: 0.9 },
+                    show: {
+                      opacity: 1,
+                      y: 0,
+                      scale: 1,
+                      transition: {
+                        type: "spring",
+                        duration: 0.8,
+                        bounce: 0.4
+                      }
+                    }
+                  }}
+                  whileHover={{ y: -10, transition: { duration: 0.3 } }}
+                  className="bg-gray-50/50 border border-gray-100 p-10 rounded-[3rem] flex flex-col hover:bg-white hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 group cursor-default"
+                >
+                  <div className={`w-14 h-14 rounded-2xl ${feature.highlight} flex items-center justify-center mb-10 border border-black/5 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-2xl font-black tracking-tight mb-5 group-hover:text-black transition-colors">{feature.title}</h3>
+                  <p className="text-black/40 font-bold text-sm leading-relaxed mb-10 group-hover:text-black/60 transition-colors">
+                    {feature.desc}
+                  </p>
+                  <Link href="#" className="mt-auto text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-3 text-black group-hover:gap-6 transition-all duration-500">
+                    LEARN MORE <ChevronRight size={12} />
+                  </Link>
+                </motion.div>
+              ))}
+            </motion.div>
           </div>
         </section>
       </main>
