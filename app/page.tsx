@@ -124,32 +124,60 @@ export default function Home() {
 
       <CustomCursor />
 
-      <header className="fixed top-0 left-0 right-0 z-[100] px-6 py-8 flex justify-center">
-        <nav className={`flex items-center gap-1 px-1.5 py-1.5 ${scrolled ? "bg-white/90 backdrop-blur-xl shadow-lg border border-black/5" : "bg-transparent"} rounded-full transition-all duration-300`}>
+      <header className="fixed top-0 left-10 right-10 z-[100] py-8 flex items-center justify-between">
+        {/* Empty left space to balance the logo (which is absolute) */}
+        <div className="w-64 hidden lg:block" />
+
+        {/* Centered Navigation Pill */}
+        <nav className={`flex items-center gap-6 px-6 py-2 ${scrolled ? "bg-white/90 backdrop-blur-xl shadow-lg border border-black/5" : "bg-white/50 backdrop-blur-md border border-black/5"} rounded-full transition-all duration-300`}>
           <Link href="/" className="px-6 py-2 bg-black text-white text-sm font-bold rounded-full">Home</Link>
-          <Link href="#" className="px-4 py-2 text-sm font-bold text-black/60 hover:text-black transition-colors">Contact</Link>
-          <Link href="#" className="px-4 py-2 text-sm font-bold text-black/60 hover:text-black transition-colors">Influencers</Link>
-          <Link href="#" className="px-4 py-2 text-sm font-bold text-black/60 hover:text-black transition-colors mr-4">About</Link>
-          <div className="flex items-center gap-2 ml-4">
-            <Link href="/login" className="px-4 py-2 text-sm font-bold text-black">Login</Link>
-            <Link href="/signup" className="px-6 py-2 bg-black text-white text-sm font-bold rounded-full transition-transform hover:scale-105">Get Started</Link>
-          </div>
+          <Link href="#" className="text-sm font-bold text-black/60 hover:text-black transition-colors">Contact</Link>
+          <Link href="#" className="text-sm font-bold text-black/60 hover:text-black transition-colors">Influencers</Link>
+          <Link href="#" className="text-sm font-bold text-black/60 hover:text-black transition-colors">About</Link>
         </nav>
+
+        {/* Right Aligned Auth Links */}
+        <div className="flex items-center gap-6 min-w-[250px] justify-end">
+          <Link href="/login" className="text-sm font-bold text-black hover:text-black/60 transition-colors">Login</Link>
+          <Link href="/signup" className="px-6 py-2 bg-black text-white text-sm font-bold rounded-full transition-transform hover:scale-105 shadow-lg shadow-black/10">Get Started</Link>
+        </div>
       </header>
 
       <main className="flex-1">
-        <section ref={heroRef} className="relative pt-64 pb-32 px-6 flex flex-col items-center min-h-[95vh] cursor-none group bg-white overflow-hidden">
+        <section ref={heroRef} className="relative pt-40 pb-32 px-6 flex flex-col items-center min-h-[95vh] cursor-none group bg-white">
 
-          {/* Activation Circle */}
+          {/* Collabify Amoeba Logo Trigger */}
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
+            animate={{
+              scale: 1,
+              opacity: 1,
+              borderRadius: [
+                "0% 100% 70% 100% / 0% 70% 100% 100%",
+                "0% 100% 42% 100% / 0% 45% 100% 44%",
+                "0% 100% 58% 100% / 0% 45% 100% 55%",
+                "0% 100% 62% 100% / 0% 44% 100% 59%",
+                "0% 100% 70% 100% / 0% 70% 100% 100%",
+              ]
+            }}
+            transition={{
+              scale: { duration: 0.5 },
+              opacity: { duration: 0.5 },
+              borderRadius: {
+                duration: 12,
+                repeat: Infinity,
+                ease: "linear"
+              }
+            }}
             onMouseEnter={() => setIsRevealMode(true)}
-            className="absolute left-10 top-32 w-20 h-20 bg-black rounded-full z-50 flex items-center justify-center shadow-2xl transition-all hover:scale-110 active:scale-90 border border-black/10 group/trigger"
+            className="absolute left-0 top-0 w-80 h-80 bg-black z-[60] flex items-center justify-center transition-all active:scale-95 group/trigger overflow-hidden cursor-pointer pointer-events-auto"
           >
-            <Zap className="text-white w-8 h-8 group-hover/trigger:scale-125 transition-transform" />
-            <div className="absolute top-FULL pt-2 opacity-0 group-hover/trigger:opacity-100 transition-opacity whitespace-nowrap text-[8px] font-black uppercase tracking-[0.3em]">
-              Trigger Reveal
+            <div className="absolute left-10 top-10 w-32 h-32 flex items-center justify-center">
+              <img
+                src="/logocollabify.png"
+                alt="Collabify Logo"
+                className="w-full h-full object-contain"
+              />
             </div>
           </motion.div>
 
@@ -158,7 +186,7 @@ export default function Home() {
             style={{ y: heroY, opacity: heroOpacity }}
             className="max-w-4xl mx-auto flex flex-col items-center text-center relative z-10 pointer-events-none"
           >
-            <h1 className="text-2xl sm:text-4xl md:text-[3rem] font-[800] tracking-[-0.03em] mb-8 leading-[1.05] text-black">
+            <h1 className="text-2xl sm:text-4xl md:text-[2.75rem] font-[800] tracking-[-0.03em] mb-8 leading-[1.05] text-black">
               Discover, plan, scale. <br />
               With Influence at your side.
             </h1>
@@ -171,8 +199,8 @@ export default function Home() {
           </motion.div>
 
           {/* 2. Stronger Liquid Reveal Layer */}
-          <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden">
-            <svg width="100%" height="100%" className="absolute inset-0">
+          <div className="absolute inset-0 z-20 pointer-events-none">
+            <svg width="100%" height="110%" className="absolute inset-0">
               <mask id="fluidMask">
                 <g className="heavy-fluid">
                   <AnimatePresence>
@@ -199,10 +227,10 @@ export default function Home() {
                 maskImage: 'url(#fluidMask)',
                 WebkitMaskImage: 'url(#fluidMask)'
               }}
-              className="absolute inset-0 bg-black text-white pt-64 flex flex-col items-center text-center translate-z-0"
+              className="absolute top-0 left-0 right-0 bottom-[-100px] bg-black text-white pt-40 flex flex-col items-center text-center translate-z-0"
             >
               <div className="max-w-4xl mx-auto flex flex-col items-center">
-                <h1 className="text-2xl sm:text-4xl md:text-[3rem] font-[800] tracking-[-0.03em] mb-8 leading-[1.05] text-white">
+                <h1 className="text-2xl sm:text-4xl md:text-[2.75rem] font-[800] tracking-[-0.03em] mb-8 leading-[1.05] text-white">
                   Create, lead, win. <br />
                   The future is yours.
                 </h1>
@@ -236,7 +264,7 @@ export default function Home() {
         </section>
 
         {/* Feature Grid */}
-        <section className="py-48 bg-white flex flex-col items-center border-t border-black/5">
+        <section className="py-48 bg-white flex flex-col items-center">
           <div className="mb-6">
             <div className="px-6 py-2 bg-black text-white text-[10px] font-black uppercase tracking-[0.4em] rounded-full">
               The Toolkit
@@ -272,10 +300,9 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white py-24 px-6 sm:px-12 border-t border-black/[0.03]">
+      <footer className="bg-white py-24 px-6 sm:px-12 border-none">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 text-[10px] font-bold uppercase tracking-[0.3em] text-black/20">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-black rounded-xl flex items-center justify-center text-white text-[10px] font-bold">C.</div>
             <span className="text-black text-lg font-black tracking-tighter lowercase">collabify.</span>
           </div>
           <div className="flex gap-10">

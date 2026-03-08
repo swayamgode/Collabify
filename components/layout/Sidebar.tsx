@@ -16,6 +16,7 @@ import {
     ShoppingBag
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 import { logout } from '@/app/(auth)/actions';
 import { Profile } from '@/lib/types/database';
 
@@ -54,10 +55,29 @@ export function Sidebar({ user }: SidebarProps) {
     return (
         <aside className="fixed left-6 top-6 bottom-6 z-40 w-24 bg-black rounded-[40px] transition-all hidden md:block overflow-hidden shadow-2xl">
             <div className="flex h-full flex-col items-center py-12">
-                <Link href="/" className="mb-14 group">
-                    <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center group-hover:rotate-12 transition-transform duration-500">
-                        <span className="text-xl font-black text-black leading-none">C.</span>
-                    </div>
+                <Link href="/" className="mb-14 group relative">
+                    <motion.div
+                        animate={{
+                            borderRadius: [
+                                "42% 58% 70% 30% / 45% 45% 55% 55%",
+                                "70% 30% 46% 54% / 30% 29% 71% 70%",
+                                "28% 72% 52% 48% / 51% 72% 28% 49%",
+                                "42% 58% 70% 30% / 45% 45% 55% 55%",
+                            ]
+                        }}
+                        transition={{
+                            duration: 10,
+                            repeat: Infinity,
+                            ease: "linear"
+                        }}
+                        className="w-20 h-20 bg-black flex items-center justify-center transition-transform duration-500 overflow-hidden"
+                    >
+                        <img
+                            src="/logocollabify.png"
+                            alt="Collabify Logo"
+                            className="w-14 h-14 object-contain"
+                        />
+                    </motion.div>
                 </Link>
 
                 <nav className="flex-1 flex flex-col items-center space-y-6">
