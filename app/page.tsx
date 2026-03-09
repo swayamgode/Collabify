@@ -78,10 +78,10 @@ export default function Home() {
         <div className="w-64 hidden lg:block" />
         {/* Navigation Wrapper - Identical padding and size */}
         <nav className={`flex items-center gap-6 px-6 py-2 rounded-full transition-all duration-200 pointer-events-auto ${isReveal
-            ? "bg-transparent border-transparent"
-            : isScrolled
-              ? "bg-white/90 backdrop-blur-xl shadow-lg border border-black/5"
-              : "bg-white/50 backdrop-blur-md border border-black/5"
+          ? "bg-transparent border-transparent"
+          : isScrolled
+            ? "bg-white/90 backdrop-blur-xl shadow-lg border border-black/5"
+            : "bg-white/50 backdrop-blur-md border border-black/5"
           }`}>
           <Link href="/" className={`text-sm font-bold transition-colors ${isReveal ? "text-white" : "text-black"}`}>Home</Link>
           <Link href="#" className={`text-sm font-bold transition-colors ${isReveal ? "text-white/80" : "text-black/50 hover:text-black"}`}>Contact</Link>
@@ -95,8 +95,8 @@ export default function Home() {
           <Link
             href="/signup"
             className={`px-6 py-2 text-sm font-bold rounded-full transition-all hover:scale-105 shadow-xl ${isReveal
-                ? "bg-white text-black"
-                : "bg-black text-white"
+              ? "bg-white text-black"
+              : "bg-black text-white"
               }`}
           >
             Get Started
