@@ -69,6 +69,8 @@ export default defineSchema({
         ),
         minFollowers: v.optional(v.number()),
         requirements: v.optional(v.array(v.string())),
+        platforms: v.optional(v.array(v.string())),
+        ai_matches: v.optional(v.array(v.any())),
         createdAt: v.number(),
     }).index("by_brandId", ["brandId"])
         .index("by_status", ["status"]),

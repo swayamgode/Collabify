@@ -11,6 +11,9 @@ export const getProfile = query({
     },
 });
 
+// Alias for getProfileByUserId
+export const getProfileByUserId = getProfile;
+
 export const createProfile = mutation({
     args: {
         userId: v.string(),

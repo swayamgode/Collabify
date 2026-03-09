@@ -2,15 +2,15 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Plus, MoreVertical, Users, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import { getBrandCampaigns } from '@/lib/actions/campaigns';
+import { getProfileData } from '@/lib/actions/profiles';
 import { format } from 'date-fns';
 
 export default async function BrandCampaignsPage() {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const profileData = await getProfileData();
+    const brand = profileData?.roleData;
 
-    const campaigns = user ? await getBrandCampaigns(user.id) : [];
+    const campaigns = brand?.id ? await getBrandCampaigns(brand.id) : [];
 
     return (
         <div className="space-y-8">

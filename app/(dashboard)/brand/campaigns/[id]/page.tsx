@@ -5,9 +5,11 @@ import Link from 'next/link';
 import { getCampaignWithApplications } from '@/lib/actions/applications';
 import { format } from 'date-fns';
 import CampaignApplicationManager from './CampaignApplicationManager';
+import AIMatchesList from './AIMatchesList';
 
-export default async function CampaignDetailsPage({ params }: { params: { id: string } }) {
-    const campaign = await getCampaignWithApplications(params.id) as any;
+export default async function CampaignDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    const campaign = await getCampaignWithApplications(id) as any;
 
     if (!campaign) {
         return (
@@ -86,6 +88,8 @@ export default async function CampaignDetailsPage({ params }: { params: { id: st
                         applications={campaign.applications || []}
                         campaignId={campaign.id}
                     />
+
+                    <AIMatchesList matches={campaign.ai_matches || []} />
                 </div>
 
                 <div className="space-y-6">

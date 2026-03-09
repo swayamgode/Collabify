@@ -1,6 +1,10 @@
 "use server";
 
-import { getYouTubeChannelStats, getYouTubeRecentVideos, searchYouTubeChannels, YouTubeStats } from "@/lib/youtube";
+import { getYouTubeChannelStats, searchYouTubeChannels, YouTubeStats } from "@/lib/youtube";
+import { ConvexHttpClient } from "convex/browser"
+import { api } from "@/convex/_generated/api"
+
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function fetchInfluencerYouTubeStats(channelId: string): Promise<YouTubeStats | null> {
     if (!channelId) return null;
@@ -8,55 +12,51 @@ export async function fetchInfluencerYouTubeStats(channelId: string): Promise<Yo
 }
 
 export async function getInfluencers(filters?: { search?: string }) {
-    // Mock data for influencers to fix build error and support offline mode
-    const influencers = [
-        {
-            id: 'mock-1',
-            social_handle: '@alex_builds',
-            niche: ['Tech', 'Gaming'],
-            follower_count: 150000,
-            platforms: ['Instagram', 'Twitter', 'YouTube'],
+    try {
+        const influencersResult = await convex.query(api.influencers.listAllInfluencers, {});
+
+        // Map to expected UI structure
+        const influencers = influencersResult.map((inf: any) => ({
+            id: inf._id,
+            social_handle: inf.socialHandle,
+            niche: inf.niche,
+            follower_count: inf.followerCount || 0,
+            platforms: inf.platforms || ['YouTube'],
             profiles: {
-                full_name: 'Alex Rivera',
-                avatar_url: null,
-                is_verified: true
+                full_name: inf.profile?.fullName,
+                avatar_url: inf.profile?.avatarUrl,
+                is_verified: inf.profile?.isVerified,
+                bio: inf.profile?.bio
             }
-        },
-        {
-            id: 'mock-2',
-            social_handle: '@sarahstyles',
-            niche: ['Beauty', 'Fashion'],
-            follower_count: 85000,
-            platforms: ['Instagram', 'YouTube'],
-            profiles: {
-                full_name: 'Sarah Chen',
-                avatar_url: null,
-                is_verified: true
-            }
-        },
-        {
-            id: 'mock-3',
-            social_handle: '@marcus_fit',
-            niche: ['Fitness', 'Wellness'],
-            follower_count: 220000,
-            platforms: ['Instagram'],
-            profiles: {
-                full_name: 'Marcus Knight',
-                avatar_url: null,
-                is_verified: false
-            }
+        }));
+
+        if (filters?.search) {
+            const query = filters.search.toLowerCase();
+            return influencers.filter(inf =>
+                inf.profiles.full_name?.toLowerCase().includes(query) ||
+                inf.social_handle?.toLowerCase().includes(query)
+            );
         }
-    ];
 
-    if (filters?.search) {
-        const query = filters.search.toLowerCase();
-        return influencers.filter(inf =>
-            inf.profiles.full_name.toLowerCase().includes(query) ||
-            inf.social_handle.toLowerCase().includes(query)
-        );
+        return influencers;
+    } catch (error) {
+        console.warn('Convex offline or error, returning mock influencers', error);
+        // Fallback to mock data to keep UI functional
+        return [
+            {
+                id: 'mock-1',
+                social_handle: '@alex_builds',
+                niche: ['Tech', 'Gaming'],
+                follower_count: 150000,
+                platforms: ['Instagram', 'Twitter', 'YouTube'],
+                profiles: {
+                    full_name: 'Alex Rivera',
+                    avatar_url: null,
+                    is_verified: true
+                }
+            }
+        ];
     }
-
-    return influencers;
 }
 
 export async function searchExternalInfluencers(query: string) {
@@ -68,7 +68,7 @@ export async function searchExternalInfluencers(query: string) {
             is_external: true,
             social_handle: `@${channel.title.toLowerCase().replace(/\s+/g, '_')}`,
             niche: ['YouTube Creator'],
-            follower_count: 0, // We'll fetch this from stats when profile is viewed
+            follower_count: 0,
             platforms: ['YouTube'],
             profiles: {
                 full_name: channel.title,

@@ -11,6 +11,14 @@ export const getBrandByProfile = query({
     },
 });
 
+export const getFirstBrand = query({
+    args: {},
+    handler: async (ctx) => {
+        return await ctx.db.query("brands").first();
+    },
+});
+
+
 export const createBrand = mutation({
     args: {
         profileId: v.id("profiles"),

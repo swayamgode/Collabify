@@ -70,11 +70,59 @@ export const createCampaign = mutation({
         ),
         minFollowers: v.optional(v.number()),
         requirements: v.optional(v.array(v.string())),
+        platforms: v.optional(v.array(v.string())),
     },
     handler: async (ctx, args) => {
         return await ctx.db.insert("campaigns", {
             ...args,
             createdAt: Date.now(),
         });
+    },
+});
+
+export const updateAIMatches = mutation({
+    args: {
+        campaignId: v.id("campaigns"),
+        ai_matches: v.array(v.any()),
+    },
+    handler: async (ctx, args) => {
+        return await ctx.db.patch(args.campaignId, {
+            ai_matches: args.ai_matches,
+        });
+    },
+});
+
+export const getCampaignWithDetails = query({
+    args: { campaignId: v.id("campaigns") },
+    handler: async (ctx, args) => {
+        const campaign = await ctx.db.get(args.campaignId);
+        if (!campaign) return null;
+
+        const applications = await ctx.db
+            .query("applications")
+            .withIndex("by_campaignId", (q) => q.eq("campaignId", args.campaignId))
+            .collect();
+
+        const applicationsWithInfluencers = await Promise.all(
+            applications.map(async (app) => {
+                const influencer = await ctx.db.get(app.influencerId);
+                const profile = influencer ? await ctx.db.get(influencer.profileId) : null;
+                return {
+                    ...app,
+                    influencers: {
+                        social_handle: influencer?.socialHandle,
+                        profiles: profile ? {
+                            full_name: profile.fullName,
+                            avatar_url: profile.avatarUrl,
+                        } : null,
+                    },
+                };
+            })
+        );
+
+        return {
+            ...campaign,
+            applications: applicationsWithInfluencers,
+        };
     },
 });
