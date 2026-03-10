@@ -6,7 +6,7 @@ const convex = new ConvexHttpClient(url);
 
 async function dump() {
     try {
-        const result = await convex.query(api.users.getUserByEmail, { email: "swayam@example.com" });
+        const result = await convex.query(api.users.getUserByEmail, { email: "[EMAIL_ADDRESS]" });
         console.log("User:", JSON.stringify(result, null, 2));
     } catch (e) {
         console.error("Dump failed:", e);
