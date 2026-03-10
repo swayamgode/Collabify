@@ -42,9 +42,9 @@ export const getProfileData = cache(async function getProfileData() {
                             role: 'brand' as const,
                             bio: '',
                             website: '',
-                            avatar_url: null,
+                            avatar_url: undefined,
                             is_verified: true,
-                            verification_status: 'verified'
+                            verification_status: 'verified' as const,
                         },
                         roleData: {
                             ...firstBrand,
@@ -105,9 +105,9 @@ function getMockProfile(role: 'brand' | 'influencer') {
             role: role,
             bio: 'Passionate about building the future of influence.',
             website: 'https://collabify.so',
-            avatar_url: null,
+            avatar_url: undefined,
             is_verified: true,
-            verification_status: 'verified'
+            verification_status: 'verified' as const,
         },
         roleData: role === 'brand' ? {
             id: 'mock-user-id',
