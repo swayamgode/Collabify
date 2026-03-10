@@ -76,7 +76,7 @@ export async function updateApplicationStatus(applicationId: string, status: 'ap
         return { success: true }
     } catch (error) {
         console.error('Error updating application status in Convex:', error);
-        return { success: false }
+        return { success: false, error: 'Failed to update application status' }
     }
 }
 
