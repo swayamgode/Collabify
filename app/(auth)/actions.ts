@@ -60,6 +60,7 @@ export async function signup(formData: FormData) {
     const fullName = formData.get('fullName') as string;
     const role = formData.get('role') as 'brand' | 'influencer';
 
+    let redirectPath = '';
     try {
         // 1. Create the secure user credential record
         const userId = await convex.mutation(api.users.createUser, {
@@ -88,14 +89,23 @@ export async function signup(formData: FormData) {
         cookieStore.set('mock_user_id', userId, { path: '/' });
 
         revalidatePath('/', 'layout');
-        return redirect(role === 'brand' ? '/brand' : '/influencer');
+        redirectPath = role === 'brand' ? '/brand' : '/influencer';
     } catch (error: any) {
         console.error("Signup error:", error);
-        // Error could be "User already exists" from our mutation
+        
+        let errorMessage = error.message || "Failed to create account. Please try again.";
+        if (errorMessage.includes("User already exists")) {
+            errorMessage = "A user with this email already exists. Please log in instead.";
+        }
+        
         const searchParams = new URLSearchParams({
-            error: error.message || "Failed to create account. Please try again."
+            error: errorMessage
         });
-        return redirect(`/signup?${searchParams.toString()}`);
+        redirectPath = `/signup?${searchParams.toString()}`;
+    }
+
+    if (redirectPath) {
+        redirect(redirectPath);
     }
 }
 
