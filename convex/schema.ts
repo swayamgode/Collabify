@@ -110,5 +110,6 @@ export default defineSchema({
         ),
         createdAt: v.number(),
     }).index("by_campaignId", ["campaignId"])
+        .index("by_applicationId", ["applicationId"])
         .index("by_status", ["status"]),
 });

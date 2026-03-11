@@ -36,7 +36,7 @@ export default async function BrandCampaignsPage() {
                     </Card>
                 ) : (
                     campaigns.map((campaign) => (
-                        <Card key={campaign.id} className="hover:border-gray-300 transition-colors">
+                        <Card key={campaign._id} className="hover:border-gray-300 transition-colors">
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <div className="space-y-1">
                                     <CardTitle>{campaign.title}</CardTitle>
@@ -64,12 +64,12 @@ export default async function BrandCampaignsPage() {
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <MessageSquare size={16} className="text-gray-400" />
-                                        <span className="text-sm font-medium">{campaign.application_count} Applications</span>
+                                        <span className="text-sm font-medium">0 Applications</span>
                                     </div>
                                     <div className="ml-auto font-semibold">
                                         ${campaign.budget}
                                     </div>
-                                    <Link href={`/brand/campaigns/${campaign.id}`}>
+                                    <Link href={`/brand/campaigns/${campaign._id}`}>
                                         <Button variant="outline" size="sm">View Details</Button>
                                     </Link>
                                 </div>
@@ -81,3 +81,4 @@ export default async function BrandCampaignsPage() {
         </div>
     );
 }
+
