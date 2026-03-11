@@ -1,3 +1,5 @@
+'use server'
+
 import { cookies } from 'next/headers'
 import { ConvexHttpClient } from "convex/browser"
 import { api } from "@/convex/_generated/api"
@@ -28,7 +30,32 @@ export const getProfileData = cache(async function getProfileData() {
         const userId = cookieStore.get('mock_user_id')?.value;
 
         if (!userId) {
-            console.warn('No authenticated user found for profile data, using mock developer profile');
+            // In dev mode: use the first real brand from Convex instead of hardcoded mock
+            console.warn('No authenticated user, fetching first real brand from Convex for dev access...');
+            try {
+                const firstBrand = await convex.query(api.brands.getFirstBrand, {});
+                if (firstBrand) {
+                    return {
+                        profile: {
+                            id: firstBrand.profileId,
+                            full_name: firstBrand.companyName,
+                            role: 'brand' as const,
+                            bio: '',
+                            website: '',
+                            avatar_url: undefined,
+                            is_verified: true,
+                            verification_status: 'verified' as const,
+                        },
+                        roleData: {
+                            ...firstBrand,
+                            id: firstBrand._id,
+                            company_name: firstBrand.companyName,
+                        }
+                    };
+                }
+            } catch (e) {
+                console.warn('Could not fetch real brand, using mock', e);
+            }
             return getMockProfile('brand');
         }
 
@@ -78,9 +105,9 @@ function getMockProfile(role: 'brand' | 'influencer') {
             role: role,
             bio: 'Passionate about building the future of influence.',
             website: 'https://collabify.so',
-            avatar_url: null,
+            avatar_url: undefined,
             is_verified: true,
-            verification_status: 'verified'
+            verification_status: 'verified' as const,
         },
         roleData: role === 'brand' ? {
             id: 'mock-user-id',

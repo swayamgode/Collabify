@@ -58,30 +58,6 @@ export default function LoginPage() {
                         </Link>
                     </div>
                 </CardFooter>
-                <div className="px-6 pb-6 pt-2">
-                    <div className="relative mb-4">
-                        <div className="absolute inset-0 flex items-center">
-                            <span className="w-full border-t" />
-                        </div>
-                        <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-background px-2 text-muted-foreground">Dev Bypass</span>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                        <Link
-                            href="/brand"
-                            className="w-full inline-flex items-center justify-center rounded-full font-medium transition-colors h-10 px-4 text-sm bg-transparent border border-gray-200 text-foreground hover:bg-gray-50"
-                        >
-                            Brand
-                        </Link>
-                        <Link
-                            href="/influencer"
-                            className="w-full inline-flex items-center justify-center rounded-full font-medium transition-colors h-10 px-4 text-sm bg-transparent border border-gray-200 text-foreground hover:bg-gray-50"
-                        >
-                            Influencer
-                        </Link>
-                    </div>
-                </div>
             </form>
         </Card>
     );

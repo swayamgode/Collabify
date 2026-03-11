@@ -3,7 +3,7 @@ import { v } from "convex/values";
 
 export default defineSchema({
     profiles: defineTable({
-        userId: v.string(), // This will be the ID from the auth provider (e.g., Clerk)
+        userId: v.string(), // This will be the ID from the users table
         updatedAt: v.number(),
         fullName: v.optional(v.string()),
         avatarUrl: v.optional(v.string()),
@@ -20,6 +20,13 @@ export default defineSchema({
     })
         .index("by_userId", ["userId"])
         .index("by_role", ["role"]),
+
+    users: defineTable({
+        email: v.string(),
+        password: v.string(), // Store hashed passwords!
+        role: v.union(v.literal("brand"), v.literal("influencer")),
+        createdAt: v.number(),
+    }).index("by_email", ["email"]),
 
     brands: defineTable({
         profileId: v.id("profiles"),
@@ -62,6 +69,8 @@ export default defineSchema({
         ),
         minFollowers: v.optional(v.number()),
         requirements: v.optional(v.array(v.string())),
+        platforms: v.optional(v.array(v.string())),
+        ai_matches: v.optional(v.array(v.any())),
         createdAt: v.number(),
     }).index("by_brandId", ["brandId"])
         .index("by_status", ["status"]),

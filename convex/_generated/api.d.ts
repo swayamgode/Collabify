@@ -8,12 +8,15 @@
  * @module
  */
 
+import type * as applications from "../applications.js";
 import type * as brands from "../brands.js";
 import type * as campaigns from "../campaigns.js";
+import type * as http from "../http.js";
 import type * as influencers from "../influencers.js";
 import type * as products from "../products.js";
 import type * as profiles from "../profiles.js";
 import type * as seed from "../seed.js";
+import type * as users from "../users.js";
 
 import type {
   ApiFromModules,
@@ -22,12 +25,15 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  applications: typeof applications;
   brands: typeof brands;
   campaigns: typeof campaigns;
+  http: typeof http;
   influencers: typeof influencers;
   products: typeof products;
   profiles: typeof profiles;
   seed: typeof seed;
+  users: typeof users;
 }>;
 
 /**

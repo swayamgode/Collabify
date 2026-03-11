@@ -1,208 +1,113 @@
 'use server'
+// Forced recompile to use Convex backend
 
-import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { ConvexHttpClient } from "convex/browser"
+import { api } from "@/convex/_generated/api"
+import { cookies } from 'next/headers'
+import { cache } from 'react'
 
-export async function applyToCampaign(campaignId: string, message: string) {
-    const supabase = await createClient()
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
-    // Get current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+async function getAuthContext() {
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('mock_user_id')?.value;
+    if (!userId) return null;
 
-    if (authError || !user) {
-        return { error: 'You must be logged in to apply for a campaign.' }
-    }
+    const profile = await convex.query(api.profiles.getProfile, { userId });
+    if (!profile) return null;
 
-    // Check if already applied
-    const { data: existingApp, error: checkError } = await supabase
-        .from('applications')
-        .select('id')
-        .eq('campaign_id', campaignId)
-        .eq('influencer_id', user.id)
-        .single()
+    const brand = await convex.query(api.brands.getBrandByProfile, { profileId: profile._id });
+    const influencer = await convex.query(api.influencers.getInfluencerByProfile, { profileId: profile._id });
 
-    if (existingApp) {
-        return { error: 'You have already applied for this campaign.' }
-    }
-
-    const { data, error } = await supabase
-        .from('applications')
-        .insert({
-            campaign_id: campaignId,
-            influencer_id: user.id,
-            message,
-            status: 'pending',
-        })
-        .select()
-        .single()
-
-    if (error) {
-        console.error('Error applying for campaign:', error)
-        return { error: error.message }
-    }
-
-    revalidatePath('/influencer/browse')
-    revalidatePath('/influencer/applied')
-    return { success: true, data }
+    return { userId, profile, brand, influencer };
 }
 
-import { cache } from 'react'
+export async function applyToCampaign(campaignId: string, message: string) {
+    try {
+        const auth = await getAuthContext();
+
+        if (!auth?.influencer) {
+            return { error: 'You must be logged in as an influencer to apply.' }
+        }
+
+        await convex.mutation(api.applications.createApplication, {
+            campaignId: campaignId as any,
+            influencerId: auth.influencer._id,
+            message,
+        });
+
+        revalidatePath('/influencer/browse')
+        revalidatePath('/influencer/applied')
+        return { success: true };
+    } catch (error: any) {
+        return { error: error.message || 'Failed to apply' };
+    }
+}
 
 export const getInfluencerApplications = cache(async function getInfluencerApplications() {
     try {
-        const supabase = await createClient()
+        const auth = await getAuthContext();
+        if (!auth?.influencer) return [];
 
-        const { data: { user } } = await supabase.auth.getUser()
-        // if (!user) return []
-        if (!user) {
-            return [
-                {
-                    id: 'mock-app-1',
-                    status: 'pending',
-                    campaign_id: 'mock-camp-1',
-                    applied_at: new Date().toISOString(),
-                    campaigns: {
-                        title: 'Summer Tech Review',
-                        budget: 500,
-                        brands: { company_name: 'TechGear Inc.' }
-                    }
-                },
-                {
-                    id: 'mock-app-2',
-                    status: 'approved',
-                    campaign_id: 'mock-camp-2',
-                    applied_at: new Date(Date.now() - 86400000).toISOString(),
-                    campaigns: {
-                        title: 'Fitness App Launch',
-                        budget: 1200,
-                        brands: { company_name: 'FitLife' }
-                    }
-                }
-            ];
-        }
+        const apps = await convex.query(api.applications.getInfluencerApplications, {
+            influencerId: auth.influencer._id
+        });
 
-        const { data, error } = await supabase
-            .from('applications')
-            .select(`
-          *,
-          campaigns (
-            title,
-            budget,
-            brands (
-              company_name
-            )
-          )
-        `)
-            .eq('influencer_id', user.id)
-            .order('applied_at', { ascending: false })
-
-        if (error) {
-            console.error('Error fetching applications:', error)
-            throw error;
-        }
-
-        return data
+        return apps.map(app => ({
+            ...app,
+            id: app._id,
+            applied_at: new Date(app._creationTime).toISOString()
+        }));
     } catch (error) {
-        console.warn('Supabase offline or error, returning mock applications');
-        return [
-            {
-                id: 'mock-app-1',
-                status: 'pending',
-                campaign_id: 'mock-camp-1',
-                applied_at: new Date().toISOString(),
-                campaigns: {
-                    title: 'Summer Tech Review',
-                    budget: 500,
-                    brands: { company_name: 'TechGear Inc.' }
-                }
-            },
-            {
-                id: 'mock-app-2',
-                status: 'approved',
-                campaign_id: 'mock-camp-2',
-                applied_at: new Date(Date.now() - 86400000).toISOString(),
-                campaigns: {
-                    title: 'Fitness App Launch',
-                    budget: 1200,
-                    brands: { company_name: 'FitLife' }
-                }
-            }
-        ];
+        console.warn('Convex error fetching applications, returning mock');
+        return [];
     }
 })
 
-export async function updateApplicationStatus(applicationId: string, status: 'approved' | 'rejected') {
+export async function updateApplicationStatus(applicationId: string, status: 'approved' | 'rejected' | 'pending') {
     try {
-        const supabase = await createClient()
-
-        const { data, error } = await supabase
-            .from('applications')
-            .update({ status })
-            .eq('id', applicationId)
-            .select()
-            .single()
-
-        if (error) {
-            console.error('Error updating application status:', error)
-            throw error;
-        }
+        await convex.mutation(api.applications.updateApplicationStatus, {
+            applicationId: applicationId as any,
+            status: status as any
+        });
 
         revalidatePath('/brand/campaigns')
-        return { success: true, data }
+        return { success: true }
     } catch (error) {
-        return { success: true, data: { status } }
+        console.error('Error updating application status in Convex:', error);
+        return { success: false, error: 'Failed to update application status' }
     }
 }
 
 export const getCampaignWithApplications = cache(async function getCampaignWithApplications(campaignId: string) {
+    console.log("getCampaignWithApplications CALL RECEIVED WITH:", typeof campaignId, JSON.stringify(campaignId));
+    if (!campaignId || typeof campaignId !== 'string' || campaignId.trim() === '') {
+        console.warn("getCampaignWithApplications: invalid campaignId, returning null");
+        return null;
+    }
     try {
-        const supabase = await createClient()
+        const campaign = await convex.query(api.campaigns.getCampaignWithDetails, { campaignId: campaignId as any });
+        if (!campaign) return null;
 
-        const { data, error } = await supabase
-            .from('campaigns')
-            .select(`
-          *,
-          applications (
-            *,
-            influencers (
-              *,
-              profiles (*)
-            )
-          )
-        `)
-            .eq('id', campaignId)
-            .single()
-
-        if (error) {
-            console.error('Error fetching campaign details:', error)
-            throw error;
-        }
-
-        return data
-    } catch (error) {
-        console.warn('Supabase offline or error, returning mock campaign with applications');
-        // Return mock details
         return {
-            id: campaignId,
-            title: 'Summer Tech Review',
-            description: 'We need a tech enthusiast to review our new summer gadget collection.',
-            budget: 500,
-            deadline: new Date(Date.now() + 864000000).toISOString(),
-            status: 'active',
-            platforms: ['Instagram', 'YouTube'],
-            applications: [
-                {
-                    id: 'mock-app-1',
-                    status: 'pending',
-                    message: 'I would love to review this!',
-                    influencers: {
-                        social_handle: 'TechReviewer99',
-                        profiles: {
-                            full_name: 'Alex Tech'
-                        }
+            ...campaign,
+            id: campaign._id,
+            applications: campaign.applications.map((app: any) => ({
+                ...app,
+                id: app._id,
+                applied_at: new Date(app._creationTime).toISOString(),
+                influencers: {
+                    ...app.influencers,
+                    profiles: {
+                        ...app.influencers.profiles,
+                        full_name: app.influencers.profiles?.full_name || 'Incognito'
                     }
                 }
-            ]
-        }
+            }))
+        };
+    } catch (error) {
+        console.error('Error fetching campaign details from Convex:', error)
+        return null;
     }
 })

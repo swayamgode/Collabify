@@ -1,176 +1,113 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { Campaign } from '@/lib/types/database'
+import { ConvexHttpClient } from "convex/browser"
+import { api } from "@/convex/_generated/api"
+import { cookies } from 'next/headers'
+
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+
+async function getAuthContext() {
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('mock_user_id')?.value;
+    if (!userId) return null;
+
+    const profile = await convex.query(api.profiles.getProfile, { userId });
+    if (!profile) return null;
+
+    const brand = await convex.query(api.brands.getBrandByProfile, { profileId: profile._id });
+    const influencer = await convex.query(api.influencers.getInfluencerByProfile, { profileId: profile._id });
+
+    return { userId, profile, brand, influencer };
+}
 
 export async function createCampaign(formData: FormData) {
     try {
-        const supabase = await createClient()
+        const auth = await getAuthContext();
 
-        // Get current user
-        const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-        if (authError || !user) {
-            // If we're in development/offline mode, we'll allow mock creation to keep the flow working
-            console.warn('Authentication failed or timed out. Simulating creation in dev mode.');
+        if (!auth?.brand) {
+            console.warn('Authentication failed or brand not found. Cannot create campaign.');
             return {
-                success: true,
-                data: { id: 'mock-' + Date.now() },
-                message: 'Demo mode: Campaign created locally'
+                error: 'Brand profile not found or not authenticated.'
             };
         }
 
         const title = formData.get('title') as string
         const description = formData.get('description') as string
         const budget = parseFloat(formData.get('budget') as string)
-        const deadline = formData.get('deadline') as string
+        const deadlineDate = formData.get('deadline') as string
         const platforms = formData.getAll('platforms') as string[]
         const minFollowers = parseInt(formData.get('minFollowers') as string) || 0;
-        const requirements = formData.get('requirements') ? (formData.get('requirements') as string).split('\n').filter(r => r.trim() !== '') : [];
+        const requirementsText = formData.get('requirements') as string || '';
+        const requirements = requirementsText.split('\n').filter(r => r.trim() !== '');
 
-        const { data, error } = await supabase
-            .from('campaigns')
-            .insert({
-                brand_id: user.id,
-                title,
-                description,
-                budget,
-                deadline: deadline ? new Date(deadline).toISOString() : null,
-                status: 'active', // default to active for now
-                min_followers: minFollowers,
-                requirements: requirements,
-            })
-            .select()
-            .single()
+        const deadline = deadlineDate ? new Date(deadlineDate).getTime() : Date.now() + 864000000;
 
-        if (error) {
-            console.error('Error creating campaign:', error)
-            throw error;
+        const campaignId = await convex.mutation(api.campaigns.createCampaign, {
+            brandId: auth.brand._id,
+            title,
+            description,
+            budget,
+            deadline,
+            status: 'active',
+            minFollowers,
+            requirements,
+            platforms,
+        });
+
+        // Trigger n8n webhook (AI matching workflow)
+        try {
+            await fetch('http://localhost:5678/webhook-test/collabify-matcher', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    campaign: {
+                        title,
+                        description,
+                        budget,
+                        deadline,
+                        minFollowers,
+                        requirements,
+                        platforms,
+                        niche: (platforms && platforms.length > 0) ? platforms[0] : 'General',
+                    },
+                    campaignId: campaignId,
+                    brandName: auth.brand.companyName,
+                    // Point to our new custom Convex HTTP endpoint
+                    callbackUrl: `${process.env.NEXT_PUBLIC_CONVEX_SITE_URL}/update-matches`,
+                }),
+            });
+        } catch (webhookError) {
+            console.error('Failed to trigger n8n webhook:', webhookError);
         }
 
         revalidatePath('/brand/campaigns')
-        return { success: true, data }
-    } catch (error) {
-        console.warn('Supabase offline, simulating campaign creation success');
+        return { success: true, id: campaignId }
+    } catch (error: any) {
+        console.error('Error creating campaign in Convex:', error);
         return {
-            success: true,
-            data: { id: 'mock-' + Date.now() },
-            message: 'ConnectTimeoutError: Simulating success for demo'
+            error: error.message || 'An unexpected error occurred while creating the campaign.'
         };
     }
 }
 
-import { cache } from 'react'
-
-export const getCampaigns = cache(async function getCampaigns(filters?: { search?: string }) {
+export async function getCampaigns(filters?: { search?: string }) {
     try {
-        const supabase = await createClient()
-
-        let query = supabase
-            .from('campaigns')
-            .select(`
-          *,
-          brands (
-            company_name
-          )
-        `)
-            .order('created_at', { ascending: false })
-
-        const { data, error } = await query
-
-        if (error) {
-            console.error('Error fetching campaigns:', error)
-            throw error; // Trigger catch block
-        }
-
-        if (filters?.search && data) {
-            const searchLower = filters.search.toLowerCase()
-            return data.filter((campaign: any) =>
-                campaign.title.toLowerCase().includes(searchLower) ||
-                campaign.description?.toLowerCase().includes(searchLower) ||
-                campaign.brands?.company_name?.toLowerCase().includes(searchLower)
-            )
-        }
-
-        return data
+        const campaigns = await convex.query(api.campaigns.getCampaigns, { search: filters?.search });
+        return campaigns.map(c => ({ ...c, id: c._id }));
     } catch (error) {
-        console.warn('Supabase offline or error, returning mock campaigns');
-        const mockCampaigns = [
-            {
-                id: 'mock-1',
-                title: 'Summer Tech Review',
-                description: 'We need a tech enthusiast to review our new summer gadget collection.',
-                budget: 500,
-                deadline: new Date(Date.now() + 864000000).toISOString(),
-                status: 'active',
-                created_at: new Date().toISOString(),
-                brand_id: 'mock-brand-1',
-                brands: { company_name: 'TechGear Inc.' }
-            },
-            {
-                id: 'mock-2',
-                title: 'Fitness App Launch',
-                description: 'Promote our new fitness tracking app to your audience.',
-                budget: 1200,
-                deadline: new Date(Date.now() + 1728000000).toISOString(),
-                status: 'active',
-                created_at: new Date().toISOString(),
-                brand_id: 'mock-brand-2',
-                brands: { company_name: 'FitLife' }
-            }
-        ];
-
-        if (filters?.search) {
-            const searchLower = filters.search.toLowerCase()
-            return mockCampaigns.filter((campaign: any) =>
-                campaign.title.toLowerCase().includes(searchLower) ||
-                campaign.description?.toLowerCase().includes(searchLower) ||
-                campaign.brands?.company_name?.toLowerCase().includes(searchLower)
-            )
-        }
-
-        return mockCampaigns;
+        console.error('Error fetching campaigns from Convex:', error);
+        return [];
     }
-})
+}
 
-export const getBrandCampaigns = cache(async function getBrandCampaigns(brandId: string) {
+export async function getBrandCampaigns(brandId: string) {
+    if (!brandId) return [];
     try {
-        const supabase = await createClient()
-
-        const { data, error } = await supabase
-            .from('campaigns')
-            .select(`
-          *,
-          applications (count)
-        `)
-            .eq('brand_id', brandId)
-            .order('created_at', { ascending: false })
-
-        if (error) {
-            console.error('Error fetching brand campaigns:', error)
-            throw error; // Trigger catch block
-        }
-
-        // Map to include a simple count property
-        return data.map(campaign => ({
-            ...campaign,
-            application_count: (campaign.applications as any)?.[0]?.count || 0
-        }))
+        const campaigns = await convex.query(api.campaigns.getBrandCampaigns, { brandId: brandId as any });
+        return campaigns.map(c => ({ ...c, id: c._id }));
     } catch (error) {
-        console.warn('Supabase offline or error, returning mock brand campaigns');
-        return [
-            {
-                id: 'mock-1',
-                title: 'Summer Tech Review',
-                description: 'We need a tech enthusiast to review our new summer gadget collection.',
-                budget: 500,
-                deadline: new Date(Date.now() + 864000000).toISOString(),
-                status: 'active',
-                created_at: new Date().toISOString(),
-                brand_id: brandId,
-                application_count: 3
-            }
-        ];
+        console.error('Error fetching brand campaigns from Convex:', error);
+        return [];
     }
-})
+}

@@ -55,7 +55,8 @@ interface Drop {
 }
 
 export default function Home() {
-  const [scrolled, setScrolled] = useState(false);
+  const [scrolledState, setScrolled] = useState(false);
+  const scrolled = scrolledState;
   const heroRef = useRef<HTMLDivElement>(null);
   const [isRevealMode, setIsRevealMode] = useState(false);
   const [drops, setDrops] = useState<Drop[]>([]);
@@ -68,6 +69,43 @@ export default function Home() {
 
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 50]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
+
+  const NavbarContent = ({ layer }: { layer: 'base' | 'reveal' }) => {
+    const isReveal = layer === 'reveal';
+    const isScrolled = scrolled;
+
+    return (
+      <>
+        <div className="w-64 hidden lg:block" />
+        {/* Navigation Wrapper - Identical padding and size */}
+        <nav className={`flex items-center gap-6 px-6 py-2 rounded-full transition-all duration-200 pointer-events-auto ${isReveal
+          ? "bg-transparent border-transparent"
+          : isScrolled
+            ? "bg-white/90 backdrop-blur-xl shadow-lg border border-black/5"
+            : "bg-white/50 backdrop-blur-md border border-black/5"
+          }`}>
+          <Link href="/" className={`text-sm font-bold transition-colors ${isReveal ? "text-white" : "text-black"}`}>Home</Link>
+          <Link href="#" className={`text-sm font-bold transition-colors ${isReveal ? "text-white/80" : "text-black/50 hover:text-black"}`}>Contact</Link>
+          <Link href="#" className={`text-sm font-bold transition-colors ${isReveal ? "text-white/80" : "text-black/50 hover:text-black"}`}>Influencers</Link>
+          <Link href="#" className={`text-sm font-bold transition-colors ${isReveal ? "text-white/80" : "text-black/50 hover:text-black"}`}>About</Link>
+        </nav>
+
+        {/* Auth Group - Identical spacing */}
+        <div className="flex items-center gap-6 min-w-[250px] justify-end pointer-events-auto">
+          <Link href="/login" className={`text-sm font-bold transition-colors ${isReveal ? "text-white" : "text-black"}`}>Login</Link>
+          <Link
+            href="/signup"
+            className={`px-6 py-2 text-sm font-bold rounded-full transition-all hover:scale-105 shadow-xl ${isReveal
+              ? "bg-white text-black"
+              : "bg-black text-white"
+              }`}
+          >
+            Get Started
+          </Link>
+        </div>
+      </>
+    );
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -129,23 +167,9 @@ export default function Home() {
 
       <CustomCursor />
 
-      <header className="fixed top-0 left-10 right-10 z-[100] py-8 flex items-center justify-between">
-        {/* Empty left space to balance the logo (which is absolute) */}
-        <div className="w-64 hidden lg:block" />
-
-        {/* Centered Navigation Pill */}
-        <nav className={`flex items-center gap-6 px-6 py-2 ${isRevealMode ? "bg-white/10 backdrop-blur-xl border-white/10" : scrolled ? "bg-white/90 backdrop-blur-xl shadow-lg border border-black/5" : "bg-white/50 backdrop-blur-md border border-black/5"} rounded-full transition-all duration-300`}>
-          <Link href="/" className={`${isRevealMode ? "bg-white text-black" : "bg-black text-white"} px-6 py-2 text-sm font-bold rounded-full transition-colors`}>Home</Link>
-          <Link href="#" className={`text-sm font-bold ${isRevealMode ? "text-white/60 hover:text-white" : "text-black/60 hover:text-black"} transition-colors`}>Contact</Link>
-          <Link href="#" className={`text-sm font-bold ${isRevealMode ? "text-white/60 hover:text-white" : "text-black/60 hover:text-black"} transition-colors`}>Influencers</Link>
-          <Link href="#" className={`text-sm font-bold ${isRevealMode ? "text-white/60 hover:text-white" : "text-black/60 hover:text-black"} transition-colors`}>About</Link>
-        </nav>
-
-        {/* Right Aligned Auth Links */}
-        <div className="flex items-center gap-6 min-w-[250px] justify-end">
-          <Link href="/login" className={`text-sm font-bold ${isRevealMode ? "text-white hover:text-white/60" : "text-black hover:text-black/60"} transition-colors`}>Login</Link>
-          <Link href="/signup" className={`${isRevealMode ? "bg-white text-black" : "bg-black text-white"} px-6 py-2 text-sm font-bold rounded-full transition-transform hover:scale-105 shadow-lg ${isRevealMode ? "shadow-white/5" : "shadow-black/10"}`}>Get Started</Link>
-        </div>
+      {/* Base Layer Header - Stays Black */}
+      <header className={`fixed top-0 left-10 right-10 z-[100] py-8 flex items-center justify-between pointer-events-none transition-opacity duration-300 ${isRevealMode ? 'opacity-100' : 'opacity-100'}`}>
+        <NavbarContent layer="base" />
       </header>
 
       <main className="flex-1">
@@ -238,6 +262,11 @@ export default function Home() {
               }}
               className="absolute top-0 left-0 right-0 bottom-[-100px] bg-black text-white pt-40 flex flex-col items-center text-center translate-z-0"
             >
+              {/* Reveal Layer Header - Turns White Only Where Fluid Is */}
+              <header className="fixed top-0 left-10 right-10 z-[110] py-8 flex items-center justify-between pointer-events-none">
+                <NavbarContent layer="reveal" />
+              </header>
+
               {/* Subtle Stars Background */}
               <div className="absolute inset-0 z-0 pointer-events-none opacity-60">
                 {/* Cluster 1 */}
