@@ -9,6 +9,8 @@ import {
   Zap,
   Globe,
   ShieldCheck,
+  Sun,
+  Moon
 } from "lucide-react";
 import {
   motion,
@@ -49,36 +51,51 @@ const features = [
 ];
 
 interface Drop {
-  id: number;
+  id: number | string;
   x: number;
   y: number;
+  fullScreen?: boolean;
 }
 
 export default function Home() {
   const [scrolledState, setScrolled] = useState(false);
   const scrolled = scrolledState;
+  const mainRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
-  const [isRevealMode, setIsRevealMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [drops, setDrops] = useState<Drop[]>([]);
   const dropIdCounter = useRef(0);
 
   const { scrollYProgress } = useScroll({
-    target: heroRef,
+    target: mainRef,
     offset: ["start start", "end start"]
   });
 
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 50]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
 
-  const NavbarContent = ({ layer }: { layer: 'base' | 'reveal' }) => {
+  const handleThemeToggle = (x: number, y: number) => {
+    setIsDarkMode((prev) => {
+      const newIsDark = !prev;
+      if (newIsDark) {
+        setDrops(d => [...d.filter(drop => drop.id !== 'theme-toggle'), { id: 'theme-toggle', x, y, fullScreen: true }]);
+      } else {
+        setDrops(d => d.filter(drop => drop.id !== 'theme-toggle'));
+      }
+      return newIsDark;
+    });
+  };
+
+  const NavbarContent = ({ layer, isInteractive }: { layer: 'base' | 'reveal', isInteractive: boolean }) => {
     const isReveal = layer === 'reveal';
     const isScrolled = scrolled;
+    const pointerEvents = isInteractive ? 'pointer-events-auto' : 'pointer-events-none';
 
     return (
       <>
         <div className="w-64 hidden lg:block" />
         {/* Navigation Wrapper - Identical padding and size */}
-        <nav className={`flex items-center gap-6 px-6 py-2 rounded-full transition-all duration-200 pointer-events-auto ${isReveal
+        <nav className={`flex items-center gap-6 px-6 py-2 rounded-full transition-all duration-200 ${pointerEvents} ${isReveal
           ? "bg-transparent border-transparent"
           : isScrolled
             ? "bg-white/90 backdrop-blur-xl shadow-lg border border-black/5"
@@ -91,10 +108,26 @@ export default function Home() {
         </nav>
 
         {/* Auth Group - Identical spacing */}
-        <div className="flex items-center gap-6 min-w-[250px] justify-end pointer-events-auto">
-          <Link href="/login" className={`text-sm font-bold transition-colors ${isReveal ? "text-white" : "text-black"}`}>Login</Link>
+        <div className={`flex items-center gap-6 min-w-[250px] justify-end ${pointerEvents}`}>
+          <button 
+            tabIndex={isInteractive ? 0 : -1}
+            onClick={(e) => {
+              if (mainRef.current && isInteractive) {
+                const rect = mainRef.current.getBoundingClientRect();
+                const btnReact = e.currentTarget.getBoundingClientRect();
+                const x = btnReact.left + btnReact.width / 2 - rect.left;
+                const y = btnReact.top + btnReact.height / 2 - rect.top;
+                handleThemeToggle(x, y);
+              }
+            }}
+            className={`p-2 rounded-full transition-colors flex items-center justify-center ${isReveal ? "text-white hover:bg-white/10" : "text-black hover:bg-black/10"}`}
+          >
+            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+          <Link href="/login" tabIndex={isInteractive ? 0 : -1} className={`text-sm font-bold transition-colors ${isReveal ? "text-white" : "text-black"}`}>Login</Link>
           <Link
             href="/signup"
+            tabIndex={isInteractive ? 0 : -1}
             className={`px-6 py-2 text-sm font-bold rounded-full transition-all hover:scale-105 shadow-xl ${isReveal
               ? "bg-white text-black"
               : "bg-black text-white"
@@ -112,35 +145,12 @@ export default function Home() {
       setScrolled(window.scrollY > 20);
     };
 
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isRevealMode && heroRef.current) {
-        const rect = heroRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        const newDrop = {
-          id: dropIdCounter.current++,
-          x,
-          y
-        };
-
-        setDrops(prev => [...prev, newDrop]);
-
-        // Remove drop after 15 seconds (Persistence)
-        setTimeout(() => {
-          setDrops(prev => prev.filter(d => d.id !== newDrop.id));
-        }, 15000);
-      }
-    };
-
     window.addEventListener("scroll", handleScroll);
-    window.addEventListener("mousemove", handleMouseMove);
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [isRevealMode]);
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-white text-black selection:bg-black selection:text-white antialiased overflow-x-hidden relative font-sans">
@@ -168,48 +178,20 @@ export default function Home() {
       <CustomCursor />
 
       {/* Base Layer Header - Stays Black */}
-      <header className={`fixed top-0 left-10 right-10 z-[100] py-8 flex items-center justify-between pointer-events-none transition-opacity duration-300 ${isRevealMode ? 'opacity-100' : 'opacity-100'}`}>
-        <NavbarContent layer="base" />
+      <header className={`fixed top-0 left-10 right-10 z-[100] py-8 flex items-center justify-between pointer-events-none transition-opacity duration-300 opacity-100`}>
+        <NavbarContent layer="base" isInteractive={!isDarkMode} />
       </header>
 
-      <main className="flex-1">
+      <main ref={mainRef} className="flex-1 relative">
         {/* Hero Section */}
         <section ref={heroRef} className="relative pt-40 pb-32 px-6 flex flex-col items-center min-h-[95vh] cursor-none group bg-white">
-
-          {/* Collabify Amoeba Logo Trigger */}
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{
-              scale: 1,
-              opacity: 1,
-              borderRadius: [
-                "0% 100% 70% 100% / 0% 70% 100% 100%",
-                "0% 100% 42% 100% / 0% 45% 100% 44%",
-                "0% 100% 58% 100% / 0% 45% 100% 55%",
-                "0% 100% 62% 100% / 0% 44% 100% 59%",
-                "0% 100% 70% 100% / 0% 70% 100% 100%",
-              ]
-            }}
-            transition={{
-              scale: { duration: 0.5 },
-              opacity: { duration: 0.5 },
-              borderRadius: {
-                duration: 12,
-                repeat: Infinity,
-                ease: "linear"
-              }
-            }}
-            onMouseEnter={() => setIsRevealMode(true)}
-            className="absolute left-0 top-0 w-72 h-72 bg-black z-[60] flex items-center justify-center transition-all active:scale-95 group/trigger overflow-hidden cursor-pointer pointer-events-auto"
-          >
-            <div className="absolute left-8 top-8 w-24 h-24 flex items-center justify-center">
-              <img
-                src="/logocollabify.png"
-                alt="Collabify Logo"
-                className="w-full h-full object-contain"
-              />
-            </div>
-          </motion.div>
+          <div className="absolute left-8 top-8 w-24 h-24 flex items-center justify-center z-[60] pointer-events-auto">
+            <img
+              src="/logocollabify.png"
+              alt="Collabify Logo"
+              className="w-full h-full object-contain"
+            />
+          </div>
 
           {/* 1. Base Layer (Bottom Text) */}
           <motion.div
@@ -227,114 +209,6 @@ export default function Home() {
               Get Collabify free <ArrowRight size={16} />
             </Link>
           </motion.div>
-
-          {/* 2. Stronger Liquid Reveal Layer */}
-          <div className="absolute inset-0 z-20 pointer-events-none">
-            <svg width="100%" height="110%" className="absolute inset-0">
-              <mask id="fluidMask">
-                <g className="heavy-fluid">
-                  <AnimatePresence>
-                    {drops.map((drop) => (
-                      <motion.circle
-                        key={drop.id}
-                        initial={{ r: 0, opacity: 0 }}
-                        animate={{ r: 180, opacity: 1 }}
-                        exit={{ r: 0, opacity: 0, transition: { duration: 0.5, ease: "circIn" } }}
-                        cx={drop.x}
-                        cy={drop.y}
-                        fill="white"
-                      />
-                    ))}
-                  </AnimatePresence>
-                </g>
-                {/* Organic Black Drips - Fixed to the bottom of the reveal layer */}
-                <path
-                  fill="white"
-                  d="M0,850 Q100,850 150,950 Q200,850 300,850 Q400,850 450,1050 Q500,850 650,850 Q800,850 850,980 Q900,850 1100,850 Q1250,850 1300,1020 Q1350,850 1440,850 L1440,3000 L0,3000 Z"
-                />
-              </mask>
-            </svg>
-            <motion.div
-              style={{
-                y: heroY,
-                maskImage: 'url(#fluidMask)',
-                WebkitMaskImage: 'url(#fluidMask)'
-              }}
-              className="absolute top-0 left-0 right-0 bottom-[-100px] bg-black text-white pt-40 flex flex-col items-center text-center translate-z-0"
-            >
-              {/* Reveal Layer Header - Turns White Only Where Fluid Is */}
-              <header className="fixed top-0 left-10 right-10 z-[110] py-8 flex items-center justify-between pointer-events-none">
-                <NavbarContent layer="reveal" />
-              </header>
-
-              {/* Subtle Stars Background */}
-              <div className="absolute inset-0 z-0 pointer-events-none opacity-60">
-                {/* Cluster 1 */}
-                <div className="absolute top-[15%] left-[10%] w-[1.5px] h-[1.5px] bg-white rounded-full blur-[0.2px] animate-pulse" />
-                <div className="absolute top-[25%] left-[80%] w-[1px] h-[1px] bg-white rounded-full" />
-                <div className="absolute top-[40%] left-[15%] w-[1.8px] h-[1.8px] bg-white rounded-full blur-[0.4px]" />
-                <div className="absolute top-[60%] left-[85%] w-[1.2px] h-[1.2px] bg-white rounded-full animate-pulse" />
-                <div className="absolute top-[75%] left-[25%] w-[1px] h-[1px] bg-white rounded-full" />
-                <div className="absolute top-[10%] left-[60%] w-[1.5px] h-[1.5px] bg-white rounded-full blur-[0.2px]" />
-
-                {/* Cluster 2 */}
-                <div className="absolute top-[85%] left-[55%] w-[1.8px] h-[1.8px] bg-white rounded-full blur-[0.4px] animate-pulse" style={{ animationDelay: '1s' }} />
-                <div className="absolute top-[35%] left-[92%] w-[1px] h-[1px] bg-white rounded-full" />
-                <div className="absolute top-[50%] left-[38%] w-[1.4px] h-[1.4px] bg-white rounded-full" />
-                <div className="absolute top-[92%] left-[70%] w-[1.2px] h-[1.2px] bg-white rounded-full blur-[0.2px]" />
-                <div className="absolute top-[20%] left-[45%] w-[1px] h-[1px] bg-white rounded-full opacity-50" />
-                <div className="absolute top-[65%] left-[12%] w-[1px] h-[1px] bg-white rounded-full opacity-50" />
-
-                {/* Cluster 3 (New) */}
-                <div className="absolute top-[5%] left-[25%] w-[1px] h-[1px] bg-white rounded-full" />
-                <div className="absolute top-[18%] left-[72%] w-[1.3px] h-[1.3px] bg-white rounded-full blur-[0.1px]" />
-                <div className="absolute top-[32%] left-[3%] w-[1.5px] h-[1.5px] bg-white rounded-full blur-[0.3px] animate-pulse" style={{ animationDelay: '2s' }} />
-                <div className="absolute top-[48%] left-[65%] w-[1px] h-[1px] bg-white rounded-full" />
-                <div className="absolute top-[72%] left-[95%] w-[1.8px] h-[1.8px] bg-white rounded-full blur-[0.5px]" />
-                <div className="absolute top-[88%] left-[18%] w-[1.1px] h-[1.1px] bg-white rounded-full" />
-                <div className="absolute top-[55%] left-[42%] w-[1.4px] h-[1.4px] bg-white rounded-full blur-[0.2px] animate-pulse" style={{ animationDelay: '0.5s' }} />
-                <div className="absolute top-[12%] left-[88%] w-[1px] h-[1px] bg-white rounded-full" />
-                <div className="absolute top-[78%] left-[48%] w-[1.5px] h-[1.5px] bg-white rounded-full opacity-40" />
-                <div className="absolute top-[45%] left-[22%] w-[1.2px] h-[1.2px] bg-white rounded-full blur-[0.1px]" />
-                <div className="absolute top-[95%] left-[5%] w-[1.3px] h-[1.3px] bg-white rounded-full" />
-                <div className="absolute top-[28%] left-[58%] w-[1px] h-[1px] bg-white rounded-full" />
-              </div>
-
-              <div className="max-w-4xl mx-auto flex flex-col items-center relative z-10">
-                <h1 className="text-2xl sm:text-4xl md:text-[2.75rem] font-[800] tracking-[-0.03em] mb-8 leading-[1.05] text-white">
-                  Create, lead, win. <br />
-                  The future is yours.
-                </h1>
-                <p className="text-base sm:text-lg text-white/60 font-medium mb-10 max-w-2xl px-4 leading-relaxed">
-                  Unlock exclusive tools and viral strategies <br className="hidden md:block" /> built for the next generation of brands.
-                </p>
-                <Link href="/signup" className="pointer-events-auto h-12 px-10 bg-white text-black text-sm font-bold rounded-full flex items-center gap-2 hover:scale-105 transition-transform shadow-xl">
-                  Get Collabify free <ArrowRight size={16} />
-                </Link>
-              </div>
-
-              {/* Reveal Phase Characters */}
-              <div className="absolute inset-x-0 bottom-[-100px] top-0 pointer-events-none z-0 hidden sm:block">
-                <div className="absolute left-[-6%] bottom-[22%] w-[48%] max-w-[650px]">
-                  <video
-                    autoPlay loop muted playsInline
-                    className="w-full h-auto opacity-100 contrast-[5] brightness-[1.5] grayscale"
-                  >
-                    <source src="/floating man.mp4" type="video/mp4" />
-                  </video>
-                </div>
-                {/* Floating Woman on the right - Scaled Down */}
-                <div className="absolute right-[2%] bottom-[8%] w-[30%] max-w-[450px]">
-                  <video
-                    autoPlay loop muted playsInline
-                    className="w-full h-auto opacity-100 contrast-[5] brightness-[1.5]"
-                  >
-                    <source src="/womenfloating.mp4" type="video/mp4" />
-                  </video>
-                </div>
-              </div>
-            </motion.div>
-          </div>
 
           {/* 3. Character Videos (Fixed Background) */}
           <div className="absolute inset-0 pointer-events-none z-0 hidden sm:block">
@@ -420,21 +294,154 @@ export default function Home() {
             </motion.div>
           </div>
         </section>
-      </main>
 
-      {/* Footer */}
-      <footer className="bg-white py-24 px-6 sm:px-12 border-none">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 text-[10px] font-bold uppercase tracking-[0.3em] text-black/20">
-          <div className="flex items-center gap-3">
-            <span className="text-black text-lg font-black tracking-tighter lowercase">collabify.</span>
+        {/* Footer */}
+        <footer className="bg-white py-24 px-6 sm:px-12 border-none relative z-[100]">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 text-[10px] font-bold uppercase tracking-[0.3em] text-black/20">
+            <div className="flex items-center gap-3">
+              <span className="text-black text-lg font-black tracking-tighter lowercase">collabify.</span>
+            </div>
+            <div className="flex gap-10">
+              <span>© 2026 Collabify Labs Inc.</span>
+              <Link href="#" className="hover:text-black transition-colors">Privacy Policy</Link>
+              <Link href="#" className="hover:text-black transition-colors">Terms</Link>
+            </div>
           </div>
-          <div className="flex gap-10">
-            <span>© 2026 Collabify Labs Inc.</span>
-            <Link href="#" className="hover:text-black">Privacy Policy</Link>
-            <Link href="#" className="hover:text-black">Terms</Link>
-          </div>
+        </footer>
+
+        {/* --- REVEAL LAYER FULL PAGE --- */}
+        <div className="absolute top-0 left-0 right-0 bottom-0 h-full z-[105] pointer-events-none overflow-hidden">
+          <svg width="100%" height="100%" className="absolute inset-0">
+            <mask id="fluidMask">
+              <g className="heavy-fluid">
+                <AnimatePresence>
+                  {drops.map((drop) => (
+                    <motion.circle
+                      key={drop.id}
+                      initial={{ r: 0, opacity: 0 }}
+                      animate={{ r: drop.fullScreen ? 5000 : 180, opacity: 1 }}
+                      exit={{ r: 0, opacity: 0, transition: { duration: 0.5, ease: "circIn" } }}
+                      cx={drop.x}
+                      cy={drop.y}
+                      fill="white"
+                      transition={drop.fullScreen ? { duration: 1.2, ease: "anticipate" } : undefined}
+                    />
+                  ))}
+                </AnimatePresence>
+              </g>
+            </mask>
+          </svg>
+          <motion.div
+            style={{
+              maskImage: 'url(#fluidMask)',
+              WebkitMaskImage: 'url(#fluidMask)'
+            }}
+            className="absolute top-0 left-0 right-0 h-full min-h-[150vh] bg-black text-white translate-z-0 pb-[20rem]"
+          >
+            {/* Reveal Layer Header - Turns White Only Where Fluid Is */}
+            <header className="fixed top-0 left-10 right-10 z-[110] py-8 flex items-center justify-between pointer-events-none">
+              <NavbarContent layer="reveal" isInteractive={isDarkMode} />
+            </header>
+
+            {/* Subtle Stars Background */}
+            <div className="absolute inset-0 z-0 pointer-events-none opacity-60">
+              {/* Cluster 1 */}
+              <div className="absolute top-[2%] left-[10%] w-[1.5px] h-[1.5px] bg-white rounded-full blur-[0.2px] animate-pulse" />
+              <div className="absolute top-[8%] left-[80%] w-[1px] h-[1px] bg-white rounded-full" />
+              <div className="absolute top-[15%] left-[15%] w-[1.8px] h-[1.8px] bg-white rounded-full blur-[0.4px]" />
+              <div className="absolute top-[20%] left-[85%] w-[1.2px] h-[1.2px] bg-white rounded-full animate-pulse" />
+              <div className="absolute top-[30%] left-[25%] w-[1px] h-[1px] bg-white rounded-full" />
+              
+              {/* Added more stars throughout the height */}
+              <div className="absolute top-[45%] left-[55%] w-[1.8px] h-[1.8px] bg-white rounded-full blur-[0.4px] animate-pulse" style={{ animationDelay: '1s' }} />
+              <div className="absolute top-[60%] left-[92%] w-[1px] h-[1px] bg-white rounded-full" />
+              <div className="absolute top-[75%] left-[38%] w-[1.4px] h-[1.4px] bg-white rounded-full" />
+              <div className="absolute top-[85%] left-[70%] w-[1.2px] h-[1.2px] bg-white rounded-full blur-[0.2px]" />
+              <div className="absolute top-[95%] left-[12%] w-[1px] h-[1px] bg-white rounded-full opacity-50" />
+            </div>
+
+            {/* Reveal Content - Hero Twin */}
+            <div className="relative pt-40 pb-32 px-6 flex flex-col items-center min-h-[95vh]">
+              <motion.div
+                style={{ y: heroY }}
+                className="max-w-4xl mx-auto flex flex-col items-center relative z-10 text-center"
+              >
+                <h1 className="text-2xl sm:text-4xl md:text-[2.75rem] font-[800] tracking-[-0.03em] mb-8 leading-[1.05] text-white">
+                  Create, lead, win. <br />
+                  The future is yours.
+                </h1>
+                <p className="text-base sm:text-lg text-white/60 font-medium mb-10 max-w-2xl px-4 leading-relaxed">
+                  Unlock exclusive tools and viral strategies <br className="hidden md:block" /> built for the next generation of brands.
+                </p>
+                <Link href="/signup" className="pointer-events-auto h-12 px-10 bg-white text-black text-sm font-bold rounded-full flex items-center gap-2 hover:scale-105 transition-transform shadow-xl">
+                  Get Collabify free <ArrowRight size={16} />
+                </Link>
+              </motion.div>
+
+              {/* Reveal Phase Characters */}
+              <div className="absolute inset-x-0 bottom-[-100px] top-0 pointer-events-none z-0 hidden sm:block">
+                <div className="absolute left-[-6%] bottom-[22%] w-[48%] max-w-[650px]">
+                  <video autoPlay loop muted playsInline className="w-full h-auto opacity-100 contrast-[5] brightness-[1.5] grayscale">
+                    <source src="/floating man.mp4" type="video/mp4" />
+                  </video>
+                </div>
+                <div className="absolute right-[2%] bottom-[8%] w-[30%] max-w-[450px]">
+                  <video autoPlay loop muted playsInline className="w-full h-auto opacity-100 contrast-[5] brightness-[1.5]">
+                    <source src="/womenfloating.mp4" type="video/mp4" />
+                  </video>
+                </div>
+              </div>
+            </div>
+
+            {/* Reveal Content - The Toolkit Twin (Dark Mode) */}
+            <div className="py-48 flex flex-col items-center w-full relative z-10 bg-transparent">
+              <div className="mb-6">
+                <div className="px-6 py-2 bg-white text-black text-[10px] font-black uppercase tracking-[0.4em] rounded-full">
+                  The Toolkit
+                </div>
+              </div>
+              <h2 className="text-4xl sm:text-6xl font-bold tracking-tight text-center mb-36 font-serif text-white">
+                Tools that move <br />
+                as fast as you do.
+              </h2>
+              <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {features.map((feature, i) => (
+                  <div
+                    key={i}
+                    className="bg-zinc-900 border border-zinc-800 p-10 rounded-[3rem] flex flex-col hover:bg-black hover:border-zinc-700 transition-all duration-500 group cursor-default shadow-xl"
+                  >
+                    <div className={`w-14 h-14 rounded-2xl ${feature.highlight.replace('50', '20')} flex items-center justify-center mb-10 border border-white/5`}>
+                      {feature.icon}
+                    </div>
+                    <h3 className="text-2xl font-black tracking-tight mb-5 text-white">{feature.title}</h3>
+                    <p className="text-white/40 font-bold text-sm leading-relaxed mb-10 group-hover:text-white/70 transition-colors">
+                      {feature.desc}
+                    </p>
+                    <Link href="#" className="mt-auto text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-3 text-white">
+                      LEARN MORE <ChevronRight size={12} />
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Reveal Content - Footer Twin (Dark Mode) */}
+            <footer className="bg-transparent py-24 px-6 sm:px-12 border-none">
+              <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">
+                <div className="flex items-center gap-3">
+                  <span className="text-white text-lg font-black tracking-tighter lowercase">collabify.</span>
+                </div>
+                <div className="flex gap-10">
+                  <span>© 2026 Collabify Labs Inc.</span>
+                  <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
+                  <Link href="#" className="hover:text-white transition-colors">Terms</Link>
+                </div>
+              </div>
+            </footer>
+
+          </motion.div>
         </div>
-      </footer>
+      </main>
     </div>
   );
 }
