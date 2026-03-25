@@ -8,6 +8,37 @@ import { revalidatePath } from 'next/cache'
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
+export interface UserProfile {
+    id: string;
+    full_name?: string;
+    role: 'brand' | 'influencer' | 'admin';
+    bio?: string;
+    website?: string;
+    avatar_url?: string;
+    is_verified?: boolean;
+    verification_status?: 'unverified' | 'pending' | 'verified' | 'rejected';
+}
+
+export interface InfluencerData {
+    id: string;
+    social_handle?: string;
+    follower_count?: number;
+    platforms?: string[];
+    niche?: string[];
+}
+
+export interface BrandData {
+    id: string;
+    company_name?: string;
+    industry?: string;
+    preferred_platforms?: string[];
+}
+
+export interface ProfileResponse {
+    profile: UserProfile;
+    roleData: InfluencerData | BrandData | null;
+}
+
 export async function updateProfile(formData: FormData): Promise<{ success: boolean; error?: string }> {
     try {
         // For now, updating stays as a mock or we could implement a Convex mutation
@@ -36,7 +67,7 @@ export async function updateBrandDetails(formData: FormData): Promise<{ success:
     }
 }
 
-export const getProfileData = cache(async function getProfileData() {
+export const getProfileData = cache(async function getProfileData(): Promise<ProfileResponse> {
     try {
         const cookieStore = await cookies();
         const userId = cookieStore.get('mock_user_id')?.value;

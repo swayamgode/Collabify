@@ -5,10 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Loader2, CheckCircle2, AlertCircle, User, Briefcase, Globe, Hash } from 'lucide-react';
-import { updateProfile, updateInfluencerDetails, updateBrandDetails } from '@/lib/actions/profiles';
+import { updateProfile, updateInfluencerDetails, updateBrandDetails, ProfileResponse, InfluencerData, BrandData } from '@/lib/actions/profiles';
 
-export default function SettingsClient({ data }: { data: any }) {
+export default function SettingsClient({ data }: { data: ProfileResponse }) {
     const { profile, roleData } = data;
+    const influencerData = profile.role === 'influencer' ? roleData as InfluencerData : null;
+    const brandData = profile.role === 'brand' ? roleData as BrandData : null;
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
@@ -124,12 +126,12 @@ export default function SettingsClient({ data }: { data: any }) {
                                         <label className="text-sm font-medium">Social Handle</label>
                                         <div className="relative">
                                             <Hash className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                            <Input name="socialHandle" className="pl-10" defaultValue={roleData?.social_handle || ''} placeholder="@username" />
+                                            <Input name="socialHandle" className="pl-10" defaultValue={influencerData?.social_handle || ''} placeholder="@username" />
                                         </div>
                                     </div>
                                     <div className="grid gap-2">
                                         <label className="text-sm font-medium">Follower Count</label>
-                                        <Input name="followerCount" type="number" defaultValue={roleData?.follower_count || 0} />
+                                        <Input name="followerCount" type="number" defaultValue={influencerData?.follower_count || 0} />
                                     </div>
                                     <div className="grid gap-2">
                                         <label className="text-sm font-medium">Platforms</label>
@@ -140,7 +142,7 @@ export default function SettingsClient({ data }: { data: any }) {
                                                         type="checkbox"
                                                         name="platforms"
                                                         value={p}
-                                                        defaultChecked={roleData?.platforms?.includes(p)}
+                                                        defaultChecked={influencerData?.platforms?.includes(p)}
                                                         className="rounded border-white/10 bg-white/5"
                                                     />
                                                     {p}
@@ -157,7 +159,7 @@ export default function SettingsClient({ data }: { data: any }) {
                                                         type="checkbox"
                                                         name="niche"
                                                         value={n}
-                                                        defaultChecked={roleData?.niche?.includes(n)}
+                                                        defaultChecked={influencerData?.niche?.includes(n)}
                                                         className="hidden"
                                                     />
                                                     <span className={`text-xs font-medium`}>{n}</span>
@@ -170,11 +172,11 @@ export default function SettingsClient({ data }: { data: any }) {
                                 <>
                                     <div className="grid gap-2">
                                         <label className="text-sm font-medium">Company Name</label>
-                                        <Input name="companyName" defaultValue={roleData?.company_name || ''} placeholder="Acme Inc." />
+                                        <Input name="companyName" defaultValue={brandData?.company_name || ''} placeholder="Acme Inc." />
                                     </div>
                                     <div className="grid gap-2">
                                         <label className="text-sm font-medium">Industry</label>
-                                        <Input name="industry" defaultValue={roleData?.industry || ''} placeholder="e.g. Technology, Fashion" />
+                                        <Input name="industry" defaultValue={brandData?.industry || ''} placeholder="e.g. Technology, Fashion" />
                                     </div>
                                     <div className="grid gap-2">
                                         <label className="text-sm font-medium">Preferred Platforms</label>
@@ -185,7 +187,7 @@ export default function SettingsClient({ data }: { data: any }) {
                                                         type="checkbox"
                                                         name="platforms"
                                                         value={p}
-                                                        defaultChecked={roleData?.preferred_platforms?.includes(p)}
+                                                        defaultChecked={brandData?.preferred_platforms?.includes(p)}
                                                         className="rounded border-white/10 bg-white/5"
                                                     />
                                                     {p}

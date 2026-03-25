@@ -1,6 +1,8 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { getYouTubeChannelStats, getYouTubeRecentVideos, findYouTubeChannelId } from '@/lib/youtube'
+import { getProfileData, InfluencerData } from '@/lib/actions/profiles'
+import { cache } from 'react'
 
 export interface PlatformStat {
     platform: string
@@ -240,44 +242,34 @@ const MOCK_ANALYTICS: InfluencerAnalytics = {
     },
 }
 
-import { getYouTubeChannelStats, getYouTubeRecentVideos, findYouTubeChannelId } from '@/lib/youtube'
-
-import { getProfileData } from '@/lib/actions/profiles'
-import { cache } from 'react'
-
 export const getInfluencerAnalytics = cache(async function getInfluencerAnalytics(): Promise<InfluencerAnalytics> {
     try {
-        // Use cached profile data which includes roleData
         const { profile, roleData } = await getProfileData()
 
         if (!profile || profile.role !== 'influencer' || !roleData) {
             return MOCK_ANALYTICS
         }
 
-        const influencer = roleData as any
+        const influencer = roleData as InfluencerData
 
-        let analytics = {
+        const analytics: InfluencerAnalytics = {
             ...MOCK_ANALYTICS,
             name: profile.full_name || MOCK_ANALYTICS.name,
             handle: influencer.social_handle ? `@${influencer.social_handle}` : MOCK_ANALYTICS.handle,
-            niche: (influencer.niche && influencer.niche.length) ? influencer.niche : MOCK_ANALYTICS.niche,
+            niche: (influencer.niche && influencer.niche.length > 0) ? influencer.niche : MOCK_ANALYTICS.niche,
             totalSubscribers: influencer.follower_count || MOCK_ANALYTICS.totalSubscribers,
         }
 
-        // If we have a YouTube API key and a handle, try to get real data
         if (process.env.YOUTUBE_API_KEY && influencer.social_handle) {
-            // 1. Try to find the Channel ID from the handle
             const channelId = await findYouTubeChannelId(influencer.social_handle)
 
             if (channelId) {
-                // Parallelize YouTube API calls
                 const [ytStats, ytVideos] = await Promise.all([
                     getYouTubeChannelStats(channelId),
                     getYouTubeRecentVideos(channelId, 5)
                 ])
 
                 if (ytStats) {
-                    // Update YouTube specific platform stat
                     analytics.platforms = analytics.platforms.map(p => {
                         if (p.platform === 'YouTube') {
                             return {
@@ -295,7 +287,6 @@ export const getInfluencerAnalytics = cache(async function getInfluencerAnalytic
                 }
 
                 if (ytVideos.length > 0) {
-                    // Convert YouTube videos to TopContent format
                     const realContent = ytVideos.map(v => ({
                         title: v.title,
                         platform: 'YouTube',
@@ -307,7 +298,6 @@ export const getInfluencerAnalytics = cache(async function getInfluencerAnalytic
                         url: `https://youtube.com/watch?v=${v.id}`
                     }))
 
-                    // Prepend real content to top content
                     analytics.topContent = [...realContent, ...analytics.topContent.filter(c => c.platform !== 'YouTube')].slice(0, 6)
                 }
             }
