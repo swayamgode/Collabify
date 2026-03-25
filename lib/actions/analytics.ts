@@ -250,15 +250,17 @@ export const getInfluencerAnalytics = cache(async function getInfluencerAnalytic
         // Use cached profile data which includes roleData
         const { profile, roleData } = await getProfileData()
 
-        if (!profile || profile.role !== 'influencer') return MOCK_ANALYTICS
+        if (!profile || profile.role !== 'influencer' || !roleData) {
+            return MOCK_ANALYTICS
+        }
 
-        const influencer = roleData
+        const influencer = roleData as any
 
         let analytics = {
             ...MOCK_ANALYTICS,
             name: profile.full_name || MOCK_ANALYTICS.name,
             handle: influencer.social_handle ? `@${influencer.social_handle}` : MOCK_ANALYTICS.handle,
-            niche: influencer.niche?.length ? influencer.niche : MOCK_ANALYTICS.niche,
+            niche: (influencer.niche && influencer.niche.length) ? influencer.niche : MOCK_ANALYTICS.niche,
             totalSubscribers: influencer.follower_count || MOCK_ANALYTICS.totalSubscribers,
         }
 
