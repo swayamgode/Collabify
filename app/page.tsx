@@ -19,6 +19,7 @@ import {
 } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { CustomCursor } from "@/components/landing-page/CustomCursor";
+import { LoadingScreen } from "@/components/landing-page/LoadingScreen";
 
 const features = [
   {
@@ -53,7 +54,13 @@ interface Drop {
   y: number;
 }
 
+const PRELOAD_IMAGES = [
+  "/logocollabify.png",
+  "/spilled1.png",
+];
+
 export default function Home() {
+  const [isReady, setIsReady] = useState(false);
   const [scrolledState, setScrolled] = useState(false);
   const scrolled = scrolledState;
   const heroRef = useRef<HTMLDivElement>(null);
@@ -142,7 +149,20 @@ export default function Home() {
   }, [isRevealMode]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-white text-black selection:bg-black selection:text-white antialiased overflow-x-hidden relative font-sans">
+    <>
+      <LoadingScreen
+        imageUrls={PRELOAD_IMAGES}
+        onComplete={() => setIsReady(true)}
+      />
+
+      <AnimatePresence>
+        {isReady && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }}
+            className="flex flex-col min-h-screen bg-white text-black selection:bg-black selection:text-white antialiased overflow-x-hidden relative font-sans"
+          >
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -434,6 +454,9 @@ export default function Home() {
           </div>
         </div>
       </footer>
-    </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
