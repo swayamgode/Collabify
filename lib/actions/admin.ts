@@ -62,7 +62,7 @@ export async function updateVerificationStatus(userId: string, status: 'verified
             .single()
 
         if (adminProfile?.role !== 'admin') {
-            return { error: 'Access denied. Admin only.' }
+            return { success: false, error: 'Access denied. Admin only.' }
         }
 
         const updateData: any = {

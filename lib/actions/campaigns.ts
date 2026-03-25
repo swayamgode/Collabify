@@ -28,6 +28,7 @@ export async function createCampaign(formData: FormData) {
         if (!auth?.brand) {
             console.warn('Authentication failed or brand not found. Cannot create campaign.');
             return {
+                success: false,
                 error: 'Brand profile not found or not authenticated.'
             };
         }
@@ -86,6 +87,7 @@ export async function createCampaign(formData: FormData) {
     } catch (error: any) {
         console.error('Error creating campaign in Convex:', error);
         return {
+            success: false,
             error: error.message || 'An unexpected error occurred while creating the campaign.'
         };
     }
