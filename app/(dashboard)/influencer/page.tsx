@@ -20,7 +20,7 @@ export default async function InfluencerDashboardPage() {
     return (
         <div className="space-y-12 max-w-7xl mx-auto">
             {/* Verification Banner */}
-            <VerificationBanner status={profileData?.profile?.verification_status} />
+            <VerificationBanner status={profileData?.profile?.verification_status ?? 'unverified'} />
 
             {/* Heading */}
             <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6">

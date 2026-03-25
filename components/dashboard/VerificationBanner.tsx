@@ -8,7 +8,7 @@ import { requestVerification } from '@/lib/actions/profiles';
 import { toast } from 'sonner';
 
 interface VerificationBannerProps {
-    status: 'unverified' | 'pending' | 'verified' | 'rejected' | string | null;
+    status?: 'unverified' | 'pending' | 'verified' | 'rejected' | string | null;
 }
 
 export function VerificationBanner({ status }: VerificationBannerProps) {
