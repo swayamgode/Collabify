@@ -1,19 +1,19 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useState } from "react";
 
 export const DrawArrow = ({ className }: { className?: string }) => {
-    const ref = useRef(null);
+    const [element, setElement] = useState<HTMLElement | null>(null);
     const { scrollYProgress } = useScroll({
-        target: ref,
+        target: element ? { current: element } as React.RefObject<HTMLElement> : undefined,
         offset: ["start end", "end start"]
     });
 
     const pathLength = useTransform(scrollYProgress, [0, 0.4], [0, 1]);
 
     return (
-        <div ref={ref} className={className}>
+        <div ref={setElement} className={className}>
             <motion.svg
                 width="100"
                 height="100"
