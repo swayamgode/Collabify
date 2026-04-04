@@ -26,31 +26,7 @@ async function findAndStoreMatches(campaignId: any, campaign: any) {
     try {
         const matches: any[] = [];
         
-        // 1. Internal Influencers
-        try {
-            const internalInfluencers = await convex.query(api.influencers.listAllInfluencers, {});
-            const internalMatches = internalInfluencers
-                .filter((inf: any) => (inf.followerCount || 0) >= (campaign.minFollowers || 0))
-                .filter((inf: any) => {
-                    if (!campaign.platforms || campaign.platforms.length === 0) return true;
-                    return campaign.platforms.some((p: string) => inf.platforms?.includes(p));
-                })
-                .slice(0, 5)
-                .map((inf: any) => ({
-                    channelName: inf.profile?.fullName || inf.socialHandle || 'Unknown Influencer',
-                    channelUrl: `https://youtube.com/${inf.socialHandle || ''}`,
-                    influencerId: inf.youtubeChannelId || inf._id,
-                    keyStrength: inf.niche?.[0] || 'General Creator',
-                    profileImage: inf.profile?.avatarUrl || '',
-                    reasoning: "Matched from internal database based on follower count and platform requirements.",
-                    score: 85 + Math.floor(Math.random() * 10)
-                }));
-            matches.push(...internalMatches);
-        } catch (e) {
-            console.error("Could not fetch internal influencers", e);
-        }
-
-        // 2. External YouTube channels
+        // 1. External YouTube channels
         const isYouTube = !campaign.platforms || campaign.platforms.length === 0 || campaign.platforms.includes('YouTube');
         if (isYouTube) {
             const queryLocation = campaign.location ? campaign.location : '';

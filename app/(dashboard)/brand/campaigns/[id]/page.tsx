@@ -131,18 +131,9 @@ export default async function CampaignDetailsPage({ params }: { params: Promise<
                     </Card>
                 </div>
 
-                {/* --- BOTTOM ROW: Applications & AI Matches --- */}
-                <div className="xl:col-span-6">
-                    <div className="h-full bg-white rounded-xl shadow-sm border overflow-hidden flex flex-col">
-                        <CampaignApplicationManager
-                            applications={campaign.applications || []}
-                            campaignId={campaign.id}
-                        />
-                    </div>
-                </div>
-
-                <div className="xl:col-span-6">
-                    <div className="h-full bg-white rounded-xl shadow-sm border overflow-hidden flex flex-col">
+                {/* --- BOTTOM ROW: AI Matches --- */}
+                <div className="xl:col-span-12">
+                    <div className="bg-white rounded-xl shadow-sm border overflow-hidden flex flex-col">
                         <AIMatchesList matches={campaign.ai_matches || []} />
                     </div>
                 </div>

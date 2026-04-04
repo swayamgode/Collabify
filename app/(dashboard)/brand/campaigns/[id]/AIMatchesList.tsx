@@ -177,8 +177,6 @@ export default async function AIMatchesList({ matches }: { matches: AIMatch[] })
                                     </div>
                                     <Link
                                         href={`/brand/influencers/external/${match.influencerId}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
                                     >
                                         <Button variant="outline" size="sm" className="gap-2 text-purple-700 border-purple-200 hover:bg-purple-50 hover:border-purple-300">
                                             Full Analytics <ExternalLink size={13} />
