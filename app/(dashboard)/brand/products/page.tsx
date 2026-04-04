@@ -47,8 +47,6 @@ export default function BrandProductsPage() {
         }
     };
 
-    const seed = useMutation(api.seed.seedInfluencers);
-
     return (
         <div className="space-y-8 max-w-6xl mx-auto">
             <div className="flex items-center justify-between">
@@ -57,16 +55,6 @@ export default function BrandProductsPage() {
                         <h1 className="text-4xl font-black tracking-tight text-white mb-2">Product Catalog</h1>
                         <p className="text-gray-400 text-lg">Manage products and find AI-matched influencers.</p>
                     </div>
-                    <Button
-                        variant="outline"
-                        onClick={() => {
-                            seed();
-                            toast.info("Seeding test data...");
-                        }}
-                        className="border-white/5 text-gray-700 hover:text-white hover:bg-white/5 rounded-xl h-10 px-4 text-[10px] font-black uppercase tracking-widest mt-2"
-                    >
-                        Seed Test Data
-                    </Button>
                 </div>
                 <Button
                     onClick={() => setIsAdding(!isAdding)}
