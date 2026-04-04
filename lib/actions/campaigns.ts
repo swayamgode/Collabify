@@ -53,7 +53,8 @@ async function findAndStoreMatches(campaignId: any, campaign: any) {
         // 2. External YouTube channels
         const isYouTube = !campaign.platforms || campaign.platforms.length === 0 || campaign.platforms.includes('YouTube');
         if (isYouTube) {
-            const queryWords = [campaign.title, ...(campaign.requirements || [])].join(' ').substring(0, 100);
+            const queryLocation = campaign.location ? campaign.location : '';
+            const queryWords = [campaign.title, queryLocation, ...(campaign.requirements || [])].filter(Boolean).join(' ').substring(0, 100);
             const externalResults = await searchYouTubeChannels(queryWords, 5);
             
             const youtubeMatches = externalResults.map((channel: any) => ({
@@ -90,34 +91,43 @@ export async function createCampaign(formData: FormData) {
             };
         }
 
-        const title = formData.get('title') as string
-        const description = formData.get('description') as string
-        const budget = parseFloat(formData.get('budget') as string)
-        const deadlineDate = formData.get('deadline') as string
-        const platforms = formData.getAll('platforms') as string[]
-        const minFollowers = parseInt(formData.get('minFollowers') as string) || 0;
+        const title = (formData.get('title') as string) || '';
+        const description = (formData.get('description') as string) || '';
+        const budgetStr = formData.get('budget') as string;
+        const budget = budgetStr ? parseFloat(budgetStr) : undefined;
+        const deadlineDate = formData.get('deadline') as string;
+        const platforms = formData.getAll('platforms') as string[];
+        const minFollowersStr = formData.get('minFollowers') as string;
+        const minFollowers = minFollowersStr ? parseInt(minFollowersStr, 10) : undefined;
+        const locationStr = formData.get('location') as string;
+        const location = locationStr ? locationStr.trim() : undefined;
         const requirementsText = formData.get('requirements') as string || '';
         const requirements = requirementsText.split('\n').filter(r => r.trim() !== '');
 
         const deadline = deadlineDate ? new Date(deadlineDate).getTime() : Date.now() + 864000000;
 
-        const campaignId = await convex.mutation(api.campaigns.createCampaign, {
+        const payload: Record<string, any> = {
             brandId: auth.brand._id,
             title,
-            description,
-            budget,
-            deadline,
             status: 'active',
-            minFollowers,
-            requirements,
-            platforms,
-        });
+            deadline,
+        };
+
+        if (description) payload.description = description;
+        if (budget !== undefined) payload.budget = budget;
+        if (minFollowers !== undefined) payload.minFollowers = minFollowers;
+        if (location) payload.location = location;
+        if (requirements && requirements.length > 0) payload.requirements = requirements;
+        if (platforms && platforms.length > 0) payload.platforms = platforms;
+
+        const campaignId = await convex.mutation(api.campaigns.createCampaign, payload as any);
 
         // Trigger internal AI matching workflow asynchronously
         void findAndStoreMatches(campaignId, {
             title,
             description,
             minFollowers,
+            location,
             requirements,
             platforms,
         });

@@ -69,6 +69,7 @@ export const createCampaign = mutation({
             v.literal("cancelled")
         ),
         minFollowers: v.optional(v.number()),
+        location: v.optional(v.string()),
         requirements: v.optional(v.array(v.string())),
         platforms: v.optional(v.array(v.string())),
     },
