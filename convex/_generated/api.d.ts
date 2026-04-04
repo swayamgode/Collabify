@@ -15,7 +15,6 @@ import type * as http from "../http.js";
 import type * as influencers from "../influencers.js";
 import type * as products from "../products.js";
 import type * as profiles from "../profiles.js";
-import type * as seed from "../seed.js";
 import type * as users from "../users.js";
 
 import type {
@@ -32,7 +31,6 @@ declare const fullApi: ApiFromModules<{
   influencers: typeof influencers;
   products: typeof products;
   profiles: typeof profiles;
-  seed: typeof seed;
   users: typeof users;
 }>;
 
