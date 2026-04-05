@@ -60,7 +60,7 @@ export default async function BrandCampaignsPage() {
                                 <div className="flex items-center gap-8 pt-4">
                                     <div className="flex items-center gap-2">
                                         <Users size={16} className="text-gray-400" />
-                                        <span className="text-sm font-medium">0 Influencers</span>
+                                        <span className="text-sm font-medium">{campaign.influencer_count || 0} Influencers</span>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <MessageSquare size={16} className="text-gray-400" />

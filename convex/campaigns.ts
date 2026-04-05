@@ -46,9 +46,11 @@ export const getBrandCampaigns = query({
                     .query("applications")
                     .withIndex("by_campaignId", (q) => q.eq("campaignId", campaign._id))
                     .collect();
+                const approvedApplications = applications.filter((app) => app.status === "approved");
                 return {
                     ...campaign,
                     application_count: applications.length,
+                    influencer_count: approvedApplications.length,
                 };
             })
         );

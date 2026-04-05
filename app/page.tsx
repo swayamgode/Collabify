@@ -67,11 +67,11 @@ const NavbarContent = ({ layer, scrolled }: { layer: 'base' | 'reveal', scrolled
     <>
       <div className="w-64 hidden lg:block" />
       {/* Navigation Wrapper - Identical padding and size */}
-      <nav className={`flex items-center gap-6 px-6 py-2 rounded-full transition-all duration-200 pointer-events-auto ${isReveal
+      <nav className={`flex items-center gap-6 px-6 py-2 rounded-full transition-all duration-200 pointer-events-auto border ${isReveal
         ? "bg-transparent border-transparent"
         : isScrolled
-          ? "bg-white/90 backdrop-blur-xl shadow-lg border border-black/5"
-          : "bg-white/50 backdrop-blur-md border border-black/5"
+          ? "bg-white/90 backdrop-blur-xl shadow-lg border-black/5"
+          : "bg-white/50 backdrop-blur-md border-black/5"
         }`}>
         <Link href="/" className={`text-sm font-bold transition-colors ${isReveal ? "text-white" : "text-black"}`}>Home</Link>
         <Link href="#" className={`text-sm font-bold transition-colors ${isReveal ? "text-white/80" : "text-black/50 hover:text-black"}`}>Contact</Link>
@@ -117,6 +117,9 @@ const HeroSection = ({
     target: heroElement ? { current: heroElement } as React.RefObject<HTMLElement> : undefined,
     offset: ["start start", "end start"]
   });
+
+  const { scrollY } = useScroll();
+  const fixedMaskY = useTransform(scrollY, (v) => -v);
 
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 50]);
 
@@ -203,6 +206,24 @@ const HeroSection = ({
               d="M0,850 Q100,850 150,950 Q200,850 300,850 Q400,850 450,1050 Q500,850 650,850 Q800,850 850,980 Q900,850 1100,850 Q1250,850 1300,1020 Q1350,850 1440,850 L1440,3000 L0,3000 Z"
             />
           </mask>
+          
+          <mask id="fluidMaskFixed" maskUnits="userSpaceOnUse" x="-50%" y="-50%" width="200%" height="200%">
+            <motion.g className="heavy-fluid" style={{ y: fixedMaskY }}>
+              <AnimatePresence>
+                {drops.map((drop) => (
+                  <motion.circle
+                    key={`fixed-${drop.id}`}
+                    initial={{ r: 0, opacity: 0 }}
+                    animate={{ r: 180, opacity: 1 }}
+                    exit={{ r: 0, opacity: 0, transition: { duration: 0.5, ease: "circIn" } }}
+                    cx={drop.x}
+                    cy={drop.y}
+                    fill="white"
+                  />
+                ))}
+              </AnimatePresence>
+            </motion.g>
+          </mask>
         </svg>
         <motion.div
           style={{
@@ -212,11 +233,6 @@ const HeroSection = ({
           }}
           className="absolute top-0 left-0 right-0 bottom-[-100px] bg-black text-white pt-40 flex flex-col items-center text-center translate-z-0"
         >
-          {/* Reveal Layer Header - Turns White Only Where Fluid Is */}
-          <header className="fixed top-0 left-10 right-10 z-[110] py-8 flex items-center justify-between pointer-events-none">
-            <NavbarContent layer="reveal" scrolled={scrolled} />
-          </header>
-
           {/* Subtle Stars Background */}
           <div className="absolute inset-0 z-0 pointer-events-none opacity-60">
             {/* Cluster 1 */}
@@ -394,6 +410,15 @@ export default function Home() {
 
       <header className={`fixed top-0 left-10 right-10 z-[100] py-8 flex items-center justify-between pointer-events-none transition-opacity duration-300 ${isRevealMode ? 'opacity-100' : 'opacity-100'}`}>
         <NavbarContent layer="base" scrolled={scrolled} />
+      </header>
+
+      <header className={`fixed top-0 left-10 right-10 z-[110] py-8 flex items-center justify-between pointer-events-none transition-opacity duration-300 ${isRevealMode ? 'opacity-100' : 'opacity-0'}`}
+        style={{
+          maskImage: 'url(#fluidMaskFixed)',
+          WebkitMaskImage: 'url(#fluidMaskFixed)'
+        }}
+      >
+        <NavbarContent layer="reveal" scrolled={scrolled} />
       </header>
 
         <main className="flex-1">
