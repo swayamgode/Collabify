@@ -25,7 +25,7 @@ export function Topbar({ user }: TopbarProps) {
         <div className="fixed top-6 left-40 right-10 z-30 flex items-start justify-end gap-6 pointer-events-none">
             {/* Greeting box removed as per user request for a cleaner design */}
 
-            <div className="glass px-8 py-4 rounded-design flex items-center gap-8 border-white/40 shadow-premium pointer-events-auto">
+            <div className="glass px-8 py-4 rounded-[32px] flex items-center gap-8 border-white/40 shadow-premium pointer-events-auto">
                 <div className="relative group">
                     <Search className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-4 text-secondary group-focus-within:text-foreground transition-colors" />
                     <input

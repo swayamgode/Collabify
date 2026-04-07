@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
-import { Plus, Sparkles, ShoppingBag, ArrowRight, Users, Wand2 } from "lucide-react";
+import { Plus, Sparkles, ShoppingBag, ArrowRight, Users, Wand2, Youtube, ExternalLink, Play, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/Select";
 import { motion, AnimatePresence } from "framer-motion";
+import { fetchInfluencerYouTubeStats } from "@/lib/actions/influencers";
 
 export default function BrandProductsPage() {
     // Mock Profile Access (linked to Clerk/Auth later)
@@ -48,60 +49,59 @@ export default function BrandProductsPage() {
     };
 
     return (
-        <div className="space-y-8 max-w-6xl mx-auto">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-6">
-                    <div>
-                        <h1 className="text-4xl font-black tracking-tight text-white mb-2">Product Catalog</h1>
-                        <p className="text-gray-400 text-lg">Manage products and find AI-matched influencers.</p>
-                    </div>
+        <div className="space-y-6 max-w-6xl mx-auto">
+            <div className="flex items-center justify-between pb-4 border-b border-black/10">
+                <div>
+                    <h1 className="text-2xl font-black tracking-tight text-black">Product Catalog</h1>
+                    <p className="text-neutral-500 text-sm mt-1">Manage products and find AI-matched influencers.</p>
                 </div>
                 <Button
                     onClick={() => setIsAdding(!isAdding)}
-                    className="gap-2 bg-white text-black hover:bg-gray-200 transition-all duration-300 rounded-2xl h-12 px-6"
+                    className="gap-2 bg-black text-white hover:bg-neutral-800 transition-all rounded-md h-9 px-4 text-xs font-bold uppercase tracking-wider"
                 >
-                    {isAdding ? "Cancel" : <><Plus size={20} /> Add Product</>}
+                    {isAdding ? "Cancel" : <><Plus size={16} /> Add Product</>}
                 </Button>
             </div>
 
             <AnimatePresence>
                 {isAdding && (
                     <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="overflow-hidden"
                     >
-                        <Card className="bg-white/5 border-white/10 backdrop-blur-xl">
-                            <CardHeader>
+                        <Card className="bg-white border hover:border-black/50 transition-colors border-black/20 shadow-none rounded-md mb-6">
+                            <CardHeader className="pb-4">
                                 <div className="flex items-center gap-2">
-                                    <Wand2 className="text-purple-400" size={20} />
-                                    <CardTitle className="text-white text-xl">New Product Affinity Analysis</CardTitle>
+                                    <Wand2 className="text-black" size={16} />
+                                    <CardTitle className="text-black text-base font-bold uppercase tracking-wider">New Product Affinity Analysis</CardTitle>
                                 </div>
-                                <CardDescription className="text-gray-400">Describe your product to start the recommendation engine.</CardDescription>
+                                <CardDescription className="text-neutral-500 text-xs">Describe your product to start the recommendation engine.</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <form onSubmit={handleSubmit} className="space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-400 uppercase tracking-widest text-[10px]">Product Name</label>
+                                <form onSubmit={handleSubmit} className="space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-bold text-black uppercase tracking-wider">Product Name</label>
                                             <Input
                                                 value={formData.name}
                                                 onChange={(e: any) => setFormData({ ...formData, name: e.target.value })}
                                                 placeholder="e.g., Quantum X1 Smartwatch"
-                                                className="bg-black/50 border-white/10 text-white rounded-xl h-12"
+                                                className="bg-white border-black/20 text-black rounded-md h-10 text-sm focus-visible:ring-black"
                                                 required
                                             />
                                         </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-400 uppercase tracking-widest text-[10px]">Primary Category</label>
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-bold text-black uppercase tracking-wider">Primary Category</label>
                                             <Select
                                                 value={formData.category}
                                                 onValueChange={(val: string) => setFormData({ ...formData, category: val })}
                                             >
-                                                <SelectTrigger className="bg-black/50 border-white/10 text-white rounded-xl h-12">
+                                                <SelectTrigger className="bg-white border-black/20 text-black rounded-md h-10 text-sm focus:ring-black">
                                                     <SelectValue placeholder="Select Category" />
                                                 </SelectTrigger>
-                                                <SelectContent className="bg-neutral-900 border-white/10 text-white">
+                                                <SelectContent className="bg-white border-black/20 text-black rounded-md">
                                                     <SelectItem value="Tech">Tech & Gadgets</SelectItem>
                                                     <SelectItem value="Fashion">Fashion & Apparel</SelectItem>
                                                     <SelectItem value="Beauty">Beauty & Cosmetics</SelectItem>
@@ -112,17 +112,17 @@ export default function BrandProductsPage() {
                                             </Select>
                                         </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-400 uppercase tracking-widest text-[10px]">Product Narrative</label>
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-bold text-black uppercase tracking-wider">Product Narrative</label>
                                         <Textarea
                                             value={formData.description}
                                             onChange={(e: any) => setFormData({ ...formData, description: e.target.value })}
                                             placeholder="What makes this product special? We'll use this to find the right voices..."
-                                            className="bg-black/50 border-white/10 text-white rounded-xl min-h-[120px]"
+                                            className="bg-white border-black/20 text-black rounded-md min-h-[100px] text-sm focus-visible:ring-black"
                                             required
                                         />
                                     </div>
-                                    <Button type="submit" className="w-full bg-white text-black hover:bg-gray-200 h-14 rounded-xl font-black uppercase tracking-widest text-xs">
+                                    <Button type="submit" className="w-full bg-black text-white hover:bg-neutral-800 h-10 rounded-md font-bold uppercase tracking-wider text-xs mt-2">
                                         Initialize Product & Scan Influencers
                                     </Button>
                                 </form>
@@ -132,21 +132,21 @@ export default function BrandProductsPage() {
                 )}
             </AnimatePresence>
 
-            <div className="grid grid-cols-1 gap-8">
+            <div className="grid grid-cols-1 gap-6">
                 {!products ? (
-                    <div className="flex flex-col items-center justify-center p-20 gap-4">
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-white/20 border-r-2 border-white"></div>
-                        <p className="text-gray-500 font-medium animate-pulse">Synchronizing Catalog...</p>
+                    <div className="flex flex-col items-center justify-center py-20 gap-4 border border-black/10 border-dashed rounded-md">
+                        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-black/20 border-r-2 border-black"></div>
+                        <p className="text-neutral-500 text-sm font-medium animate-pulse">Synchronizing Catalog...</p>
                     </div>
                 ) : products.length === 0 ? (
-                    <Card className="bg-white/5 border-white/10 border-dashed p-20 text-center">
-                        <div className="flex flex-col items-center gap-4">
-                            <ShoppingBag size={48} className="text-gray-600 mb-2" />
+                    <Card className="bg-neutral-50 border-black/10 border-dashed py-20 rounded-md shadow-none text-center">
+                        <div className="flex flex-col items-center gap-3">
+                            <ShoppingBag size={32} className="text-neutral-400 mb-2" />
                             <div className="space-y-1">
-                                <h3 className="text-2xl font-black text-white">No active products</h3>
-                                <p className="text-gray-500 max-w-md">Your product catalog is empty. Add products to activate AI recommendations.</p>
+                                <h3 className="text-lg font-black text-black">No active products</h3>
+                                <p className="text-neutral-500 text-sm max-w-sm mx-auto">Your product catalog is empty. Add products to activate AI recommendations.</p>
                             </div>
-                            <Button variant="outline" onClick={() => setIsAdding(true)} className="mt-8 border-white/10 text-white hover:bg-white/5 h-12 px-8 rounded-2xl">
+                            <Button variant="outline" onClick={() => setIsAdding(true)} className="mt-6 border-black/20 text-black hover:bg-neutral-100 hover:border-black/40 h-9 px-6 rounded-md text-xs font-bold uppercase tracking-wider">
                                 Start Cataloging
                             </Button>
                         </div>
@@ -161,9 +161,6 @@ export default function BrandProductsPage() {
     );
 }
 
-import { fetchInfluencerYouTubeStats } from "@/lib/actions/influencers";
-import { Youtube, ExternalLink, Play, Eye } from "lucide-react";
-
 function ProductRecommendationCard({ product }: { product: any }) {
     const recommendations = useQuery(api.influencers.getRecommendedInfluencers, {
         productId: product._id
@@ -173,37 +170,37 @@ function ProductRecommendationCard({ product }: { product: any }) {
 
     useEffect(() => {
         if (recommendations) {
-            const timer = setTimeout(() => setIsScanning(false), 2000);
+            const timer = setTimeout(() => setIsScanning(false), 1500);
             return () => clearTimeout(timer);
         }
     }, [recommendations]);
 
     return (
-        <Card className="bg-white/5 border-white/10 overflow-hidden group hover:border-white/20 transition-all duration-500 rounded-[40px] relative">
-            <div className="p-10 flex flex-col lg:flex-row gap-12">
+        <Card className="bg-white border-black/10 shadow-sm rounded-md relative group hover:border-black/30 transition-colors">
+            <div className="p-6 flex flex-col lg:flex-row gap-8">
                 {/* Product Side */}
-                <div className="lg:w-1/3 space-y-6">
-                    <div className="flex items-center gap-3">
-                        <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em]">
+                <div className="lg:w-1/3 flex flex-col">
+                    <div className="flex-1">
+                        <Badge className="bg-black text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider mb-4 border-transparent">
                             {product.category}
                         </Badge>
+                        <h2 className="text-xl font-black text-black leading-tight mb-2">{product.name}</h2>
+                        <p className="text-neutral-600 text-sm leading-relaxed">
+                            {product.description}
+                        </p>
                     </div>
-                    <h2 className="text-4xl font-black text-white group-hover:text-blue-400 transition-colors leading-tight">{product.name}</h2>
-                    <p className="text-gray-400 leading-relaxed text-base font-medium opacity-80">
-                        {product.description}
-                    </p>
-                    <div className="flex gap-4 pt-4">
-                        <Button variant="outline" className="border-white/10 text-white hover:bg-white/10 rounded-2xl h-12 px-6 text-xs font-black uppercase tracking-widest">
+                    <div className="flex items-center gap-3 pt-6 lg:mt-auto border-t border-black/5 lg:border-none">
+                        <Button variant="outline" className="flex-1 lg:flex-none border-black/20 text-black hover:bg-neutral-100 rounded-md h-8 px-4 text-[10px] font-bold uppercase tracking-wider">
                             Manage
                         </Button>
-                        <Button variant="ghost" className="text-gray-600 hover:text-white rounded-2xl h-12 px-6 text-xs font-black uppercase tracking-widest">
+                        <Button variant="ghost" className="flex-1 lg:flex-none text-neutral-600 hover:text-black hover:bg-neutral-100 rounded-md h-8 px-4 text-[10px] font-bold uppercase tracking-wider">
                             Performance
                         </Button>
                     </div>
                 </div>
 
                 {/* AI Recommendations Side */}
-                <div className="flex-1 bg-neutral-900/40 rounded-[32px] p-8 border border-white/5 relative overflow-hidden backdrop-blur-sm">
+                <div className="flex-1 bg-neutral-50 rounded-md p-6 border border-black/10 relative overflow-hidden">
                     <AnimatePresence mode="wait">
                         {isScanning ? (
                             <motion.div
@@ -211,62 +208,58 @@ function ProductRecommendationCard({ product }: { product: any }) {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                className="absolute inset-0 z-20 bg-neutral-900/80 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center"
+                                className="absolute inset-0 z-20 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center"
                             >
-                                <div className="relative w-24 h-24 mb-6">
+                                <div className="relative w-16 h-16 mb-4">
                                     <motion.div
                                         animate={{ rotate: 360 }}
-                                        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                                        className="absolute inset-0 border-[3px] border-dashed border-blue-500/40 rounded-full"
+                                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                        className="absolute inset-0 border-[2px] border-dashed border-black/20 rounded-full"
                                     />
                                     <div className="absolute inset-0 flex items-center justify-center">
-                                        <Sparkles className="text-blue-400 animate-pulse" size={32} />
+                                        <Sparkles className="text-black" size={24} />
                                     </div>
                                 </div>
-                                <h4 className="text-white font-black text-sm tracking-[0.3em] uppercase mb-2">Neural Matching</h4>
-                                <p className="text-gray-500 text-xs font-medium tracking-wide">Syncing data with {product.category} network...</p>
+                                <h4 className="text-black font-black text-xs tracking-[0.2em] uppercase mb-1">Neural Matching</h4>
+                                <p className="text-neutral-500 text-[10px] font-bold tracking-wider uppercase">Syncing data with {product.category} network...</p>
 
                                 <motion.div
                                     initial={{ top: "-10%" }}
                                     animate={{ top: "110%" }}
-                                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                                    className="absolute left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-60 shadow-[0_0_25px_rgba(59,130,246,0.8)]"
+                                    transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                                    className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-black/20 to-transparent opacity-60"
                                 />
                             </motion.div>
                         ) : null}
                     </AnimatePresence>
 
-                    <div className="flex items-center justify-between mb-8">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-yellow-400/10 rounded-xl">
-                                <Sparkles size={20} className="text-yellow-400" />
-                            </div>
-                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-300">Creator Recommendations</h3>
+                    <div className="flex items-center justify-between mb-6 pb-3 border-b border-black/5">
+                        <div className="flex items-center gap-2">
+                            <Sparkles size={14} className="text-black" />
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-black">Creator Matches</h3>
                         </div>
-                        <div className="text-[10px] font-black uppercase tracking-[0.1em] text-blue-500 bg-blue-500/10 px-3 py-1.5 rounded-full border border-blue-500/20">
+                        <div className="text-[9px] font-black uppercase tracking-[0.1em] text-black bg-white px-2 py-1 rounded border border-black/10">
                             High Affinity
                         </div>
                     </div>
 
                     {!recommendations ? (
-                        <div className="space-y-4">
-                            {[1, 2, 3].map(i => <div key={i} className="h-24 bg-white/5 animate-pulse rounded-3xl" />)}
+                        <div className="space-y-3">
+                            {[1, 2, 3].map(i => <div key={i} className="h-20 bg-black/5 animate-pulse rounded-md" />)}
                         </div>
                     ) : recommendations.length === 0 ? (
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className="py-16 text-center"
+                            className="py-10 text-center"
                         >
-                            <Users size={32} className="text-gray-700 mx-auto mb-4" />
-                            <p className="text-gray-500 text-sm font-medium max-w-xs mx-auto">
-                                Our network couldn't find a direct match yet.
-                                <br />
-                                Try fine-tuning your product tags.
+                            <Users size={24} className="text-neutral-300 mx-auto mb-3" />
+                            <p className="text-neutral-500 text-xs font-medium max-w-[200px] mx-auto">
+                                No direct match found. Try fine-tuning product tags.
                             </p>
                         </motion.div>
                     ) : (
-                        <div className="grid grid-cols-1 gap-5">
+                        <div className="grid grid-cols-1 gap-3">
                             {recommendations.slice(0, 3).map((inf, idx) => (
                                 <InfluencerItem key={inf._id} inf={inf} idx={idx} />
                             ))}
@@ -274,12 +267,12 @@ function ProductRecommendationCard({ product }: { product: any }) {
                     )}
 
                     {recommendations && recommendations.length > 0 && (
-                        <div className="mt-8 pt-8 border-t border-white/5 flex items-center justify-between">
-                            <button className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] hover:text-white transition-colors flex items-center gap-2">
-                                Explore Full Match List <ArrowRight size={14} />
+                        <div className="mt-6 pt-4 border-t border-black/5 flex items-center justify-between">
+                            <button className="text-neutral-500 text-[9px] font-black uppercase tracking-wider hover:text-black transition-colors flex items-center gap-1.5">
+                                Explore Full Match List <ArrowRight size={12} />
                             </button>
-                            <div className="text-[10px] text-gray-700 font-bold tracking-widest">
-                                {recommendations.length} MATCHES FOUND
+                            <div className="text-[9px] text-black font-bold tracking-widest bg-black/5 px-2 py-1 rounded">
+                                {recommendations.length} MATCHES
                             </div>
                         </div>
                     )}
@@ -312,92 +305,94 @@ function InfluencerItem({ inf, idx }: { inf: any, idx: number }) {
 
     return (
         <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: idx * 0.1 }}
-            className="flex flex-col gap-4 p-6 rounded-[24px] bg-white/[0.03] hover:bg-white/[0.08] transition-all border border-white/5 group/inf hover:border-white/10"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: idx * 0.05 }}
+            className="flex flex-col gap-3 p-4 rounded-md bg-white border border-black/10 hover:border-black/30 transition-colors group/inf shadow-sm"
         >
-            <div className="flex items-center gap-5">
-                <div className="relative">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-black text-2xl shadow-xl">
-                        {inf.profile?.fullName?.[0] || "I"}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="flex items-center gap-4 flex-1">
+                    <div className="relative shrink-0">
+                        <div className="w-12 h-12 rounded bg-neutral-100 flex items-center justify-center text-black border border-black/10 font-black text-xl">
+                            {inf.profile?.fullName?.[0] || "I"}
+                        </div>
+                        <div className="absolute -top-1.5 -right-1.5 bg-black text-white border-2 border-white px-1.5 py-0.5 rounded text-[9px] font-black tracking-tighter">
+                            {(inf.matchScore || 0)}%
+                        </div>
                     </div>
-                    <div className="absolute -top-2 -right-2 bg-black border border-white/10 px-2 py-1 rounded-lg">
-                        <div className="text-[10px] font-black text-blue-400 tracking-tighter">{(inf.matchScore || 0)}%</div>
+
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                            <h4 className="text-black font-bold text-sm truncate">{inf.profile?.fullName || "Influencer"}</h4>
+                            {inf.profile?.isVerified && (
+                                <div className="w-3.5 h-3.5 bg-black rounded-full flex items-center justify-center shrink-0">
+                                    <svg viewBox="0 0 24 24" fill="white" className="w-2 h-2"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>
+                                </div>
+                            )}
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                            {inf.matchReasons?.map((reason: string) => (
+                                <span key={reason} className="text-[8px] text-neutral-600 bg-neutral-100 px-1.5 py-0.5 rounded border border-black/5 uppercase font-bold tracking-wider">
+                                    {reason}
+                                </span>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                        <h4 className="text-white font-black text-lg truncate tracking-tight">{inf.profile?.fullName || "Influencer"}</h4>
-                        {inf.profile?.isVerified && (
-                            <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                                <svg viewBox="0 0 24 24" fill="white" className="w-2.5 h-2.5"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>
-                            </div>
-                        )}
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        {inf.matchReasons?.map((reason: string) => (
-                            <span key={reason} className="text-[9px] text-gray-400 bg-white/5 px-2.5 py-1 rounded-md border border-white/5 uppercase font-black tracking-wider">
-                                {reason}
-                            </span>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="hidden xl:flex flex-col items-end mr-4">
-                    <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2 sm:ml-auto">
+                    {inf.youtubeChannelId && (
                         <a
-                            href={inf.youtubeChannelId ? `https://youtube.com/channel/${inf.youtubeChannelId}` : '#'}
+                            href={`https://youtube.com/channel/${inf.youtubeChannelId}`}
                             target="_blank"
-                            className="p-2 bg-red-600/10 text-red-500 rounded-lg hover:bg-red-600 hover:text-white transition-all group/yt"
+                            className="p-1.5 bg-neutral-100 text-black rounded hover:bg-black hover:text-white transition-colors border border-black/5"
                         >
-                            <Youtube size={16} />
+                            <Youtube size={14} />
                         </a>
-                        <Button variant="secondary" className="rounded-xl h-10 px-4 text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-transform">
-                            Connect
-                        </Button>
-                    </div>
+                    )}
+                    <Button variant="outline" className="border-black/20 text-black hover:bg-neutral-100 rounded h-7 px-3 text-[9px] font-bold uppercase tracking-wider">
+                        Connect
+                    </Button>
                 </div>
             </div>
 
             {/* Analytics Subsection */}
             {inf.youtubeChannelId && (
-                <div className="mt-2 pt-4 border-t border-white/5 grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-1.5 text-gray-500">
-                            <Users size={12} />
-                            <span className="text-[9px] font-black uppercase tracking-widest">Subscribers</span>
+                <div className="pt-3 border-t border-black/5 grid grid-cols-3 sm:grid-cols-4 gap-2">
+                    <div className="space-y-0.5">
+                        <div className="flex items-center gap-1 text-neutral-500">
+                            <Users size={10} />
+                            <span className="text-[8px] font-bold uppercase tracking-wider">Subs</span>
                         </div>
-                        <p className="text-white font-bold text-sm">
+                        <p className="text-black font-bold text-xs">
                             {loadingYt ? "..." : (ytStats?.subscriberCount || 0).toLocaleString()}
                         </p>
                     </div>
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-1.5 text-gray-500">
-                            <Eye size={12} />
-                            <span className="text-[9px] font-black uppercase tracking-widest">Total Views</span>
+                    <div className="space-y-0.5">
+                        <div className="flex items-center gap-1 text-neutral-500">
+                            <Eye size={10} />
+                            <span className="text-[8px] font-bold uppercase tracking-wider">Views</span>
                         </div>
-                        <p className="text-white font-bold text-sm">
+                        <p className="text-black font-bold text-xs">
                             {loadingYt ? "..." : (ytStats?.viewCount || 0).toLocaleString()}
                         </p>
                     </div>
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-1.5 text-gray-500">
-                            <Play size={12} />
-                            <span className="text-[9px] font-black uppercase tracking-widest">Videos</span>
+                    <div className="space-y-0.5">
+                        <div className="flex items-center gap-1 text-neutral-500">
+                            <Play size={10} />
+                            <span className="text-[8px] font-bold uppercase tracking-wider">Vids</span>
                         </div>
-                        <p className="text-white font-bold text-sm">
+                        <p className="text-black font-bold text-xs">
                             {loadingYt ? "..." : (ytStats?.videoCount || 0).toLocaleString()}
                         </p>
                     </div>
-                    <div className="flex items-end justify-end">
+                    <div className="hidden sm:flex items-end justify-end">
                         <a
-                            href={inf.youtubeChannelId ? `https://youtube.com/channel/${inf.youtubeChannelId}` : '#'}
+                            href={`https://youtube.com/channel/${inf.youtubeChannelId}`}
                             target="_blank"
-                            className="text-[9px] font-black text-blue-400 hover:text-blue-300 flex items-center gap-1 uppercase tracking-widest"
+                            className="text-[8px] font-bold text-black hover:text-neutral-600 flex items-center gap-1 uppercase tracking-wider"
                         >
-                            View Channel <ExternalLink size={10} />
+                            View Channel <ExternalLink size={8} />
                         </a>
                     </div>
                 </div>
@@ -406,7 +401,6 @@ function InfluencerItem({ inf, idx }: { inf: any, idx: number }) {
     );
 }
 
-// Simple Badge component since it might not be in the UI library yet
 function Badge({ children, className }: { children: React.ReactNode, className?: string }) {
     return (
         <div className={`inline-flex items-center border rounded-full font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 pr-2 ${className}`}>
@@ -414,3 +408,4 @@ function Badge({ children, className }: { children: React.ReactNode, className?:
         </div>
     )
 }
+

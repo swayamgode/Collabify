@@ -53,9 +53,9 @@ export function Sidebar({ user }: SidebarProps) {
     }
 
     return (
-        <aside className="fixed left-6 top-6 bottom-6 z-40 w-24 bg-black rounded-[40px] transition-all hidden md:block overflow-hidden shadow-2xl">
-            <div className="flex h-full flex-col items-center py-12">
-                <Link href="/" className="mb-14 group relative">
+        <aside className="fixed left-6 top-6 bottom-6 z-40 w-20 bg-black rounded-[32px] transition-all hidden md:block overflow-hidden shadow-2xl">
+            <div className="flex h-full flex-col items-center py-8">
+                <Link href="/" className="mb-10 group relative">
                     <motion.div
                         animate={{
                             borderRadius: [
@@ -70,17 +70,17 @@ export function Sidebar({ user }: SidebarProps) {
                             repeat: Infinity,
                             ease: "linear"
                         }}
-                        className="w-20 h-20 bg-black flex items-center justify-center transition-transform duration-500 overflow-hidden"
+                        className="w-12 h-12 bg-black flex items-center justify-center transition-transform duration-500 overflow-hidden"
                     >
                         <img
                             src="/logocollabify.png"
                             alt="Collabify Logo"
-                            className="w-14 h-14 object-contain"
+                            className="w-8 h-8 object-contain"
                         />
                     </motion.div>
                 </Link>
 
-                <nav className="flex-1 flex flex-col items-center space-y-6">
+                <nav className="flex-1 flex flex-col items-center space-y-4">
                     {links.map((link) => {
                         const Icon = link.icon;
                         const isActive = pathname === link.href;
@@ -89,15 +89,15 @@ export function Sidebar({ user }: SidebarProps) {
                                 key={link.href}
                                 href={link.href}
                                 className={cn(
-                                    "relative flex flex-col items-center justify-center p-4 rounded-[24px] transition-all duration-500 group",
+                                    "relative flex items-center justify-center w-10 h-10 rounded-[14px] transition-all duration-300 group",
                                     isActive
-                                        ? "bg-white text-black scale-110 shadow-[0_0_20px_rgba(255,255,255,0.15)]"
-                                        : "text-gray-500 hover:text-white hover:bg-white/5"
+                                        ? "bg-white text-black shadow-lg"
+                                        : "text-neutral-500 hover:text-white hover:bg-white/10"
                                 )}
                             >
-                                <Icon size={22} className={cn("transition-all duration-500", isActive ? "stroke-[2.5px]" : "stroke-[1.5px] group-hover:scale-110")} />
+                                <Icon size={18} className={cn("transition-all duration-300", isActive ? "stroke-[2.5px]" : "stroke-[1.5px] group-hover:scale-110")} />
                                 <span className={cn(
-                                    "absolute left-24 px-3 py-1.5 rounded-xl bg-black text-white text-[10px] font-bold uppercase tracking-widest opacity-0 -translate-x-4 pointer-events-none transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 border border-white/10 whitespace-nowrap z-50",
+                                    "absolute left-16 px-2.5 py-1 rounded-lg bg-black text-white text-[10px] font-bold uppercase tracking-widest opacity-0 -translate-x-2 pointer-events-none transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0 border border-white/10 whitespace-nowrap z-50 shadow-xl",
                                     isActive && "hidden"
                                 )}>
                                     {link.label}
@@ -107,13 +107,13 @@ export function Sidebar({ user }: SidebarProps) {
                     })}
                 </nav>
 
-                <div className="mt-auto flex flex-col items-center space-y-4">
+                <div className="mt-auto flex flex-col items-center space-y-3">
                     <Link href="/settings" className={cn(
-                        "p-4 rounded-[24px] transition-all duration-500 group relative",
-                        pathname === '/settings' ? "bg-white text-black" : "text-gray-500 hover:text-white hover:bg-white/5"
+                        "relative flex items-center justify-center w-10 h-10 rounded-[14px] transition-all duration-300 group",
+                        pathname === '/settings' ? "bg-white text-black shadow-lg" : "text-neutral-500 hover:text-white hover:bg-white/10"
                     )}>
-                        <Settings size={22} className="group-hover:rotate-45 transition-transform duration-500" />
-                        <span className="absolute left-24 px-3 py-1.5 rounded-xl bg-black text-white text-[10px] font-bold uppercase tracking-widest opacity-0 -translate-x-4 pointer-events-none transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 border border-white/10 whitespace-nowrap z-50">
+                        <Settings size={18} className="group-hover:rotate-90 transition-transform duration-300" />
+                        <span className="absolute left-16 px-2.5 py-1 rounded-lg bg-black text-white text-[10px] font-bold uppercase tracking-widest opacity-0 -translate-x-2 pointer-events-none transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0 border border-white/10 whitespace-nowrap z-50 shadow-xl">
                             Settings
                         </span>
                     </Link>
@@ -121,10 +121,10 @@ export function Sidebar({ user }: SidebarProps) {
                         onClick={async () => {
                             await logout();
                         }}
-                        className="p-4 rounded-[24px] text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-500 group relative"
+                        className="relative flex items-center justify-center w-10 h-10 rounded-[14px] text-neutral-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300 group"
                     >
-                        <LogOut size={22} />
-                        <span className="absolute left-24 px-3 py-1.5 rounded-xl bg-red-600 text-white text-[10px] font-bold uppercase tracking-widest opacity-0 -translate-x-4 pointer-events-none transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 whitespace-nowrap z-50">
+                        <LogOut size={18} />
+                        <span className="absolute left-16 px-2.5 py-1 rounded-lg bg-red-600 text-white text-[10px] font-bold uppercase tracking-widest opacity-0 -translate-x-2 pointer-events-none transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0 whitespace-nowrap z-50 shadow-xl">
                             Logout
                         </span>
                     </button>
